@@ -86,9 +86,18 @@ def main():
 
 
         ### RUNNING PHYSICS ENGINE ###
-        
+        # LINEAR SCALE
+        if ACTUAL_SCALAR != TIME_SCALAR:
+            if ACTUAL_SCALAR == 0 and TIME_SCALAR == 1:
+                PhysicsEngine(TIME_SCALAR)
+            elif ACTUAL_SCALAR > TIME_SCALAR:
+                ACTUAL_SCALAR -= 10
+            else:
+                ACTUAL_SCALAR += 10
+            PhysicsEngine(ACTUAL_SCALAR)
+            
         # BASIC LOOP, FOR WHEN SIM IS BETWEEN 1SEC AND 60SEC
-        if BASIC_LOOP > 1 and BASIC_LOOP_COUNTER >= 1 and GOD_LOOP == 1:
+        elif BASIC_LOOP > 1 and BASIC_LOOP_COUNTER >= 1 and GOD_LOOP == 1:
             if BASIC_LOOP_COUNTER == BASIC_LOOP:
                 PhysicsEngine(TIME_SCALAR)
             elif BASIC_LOOP_COUNTER == 60:
@@ -101,19 +110,8 @@ def main():
             print('GOD MODE ENGAGED')
             for x in range(0, GOD_LOOP):
                 PhysicsEngine(TIME_SCALAR)
-
-        # LINEAR SCALE
-        elif ACTUAL_SCALAR != TIME_SCALAR:
-            if ACTUAL_SCALAR == 0 and TIME_SCALAR == 1:
-                PhysicsEngine(TIME_SCALAR)
-            elif ACTUAL_SCALAR > TIME_SCALAR:
-                ACTUAL_SCALAR -= 10
-            else:
-                ACTUAL_SCALAR += 10
-            PhysicsEngine(ACTUAL_SCALAR)
         
         else:
-            #print('IS THIS REALLY RUNNING?')
             PhysicsEngine(TIME_SCALAR)
         
         
