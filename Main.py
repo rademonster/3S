@@ -79,7 +79,9 @@ def main():
                         TIME_SCALAR = int(TIME_SCALAR/10)
                     elif BASIC_LOOP < FPS:
                         BASIC_LOOP += 10
-                        
+
+                # MAP / FOCUS KEY INPUT
+                
                     
 
 
@@ -179,7 +181,7 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK):
         DISPLAYSURF.blit(UPSText, (12, 48))
 
 
-    ### RETICLE ###
+    # RETICLE
     radius = int(round(FocusBody.Diameter*KM2PIX/2) + 5)
     pygame.draw.circle(DISPLAYSURF, WHITE, (round(SURF_WIDTH/2), round(SURF_HEIGHT/2)), radius, 1)
     pygame.draw.polygon(DISPLAYSURF, WHITE, ((round(SURF_WIDTH/2) - 3, round(SURF_HEIGHT/2) - radius), (round(SURF_WIDTH/2), round(SURF_HEIGHT/2) - radius - 5), (round(SURF_WIDTH/2) + 3, round(SURF_HEIGHT/2) - radius)), 1)
@@ -189,6 +191,8 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK):
     textrect.centerx = round(SURF_WIDTH/2)
     textrect.centery = round(SURF_HEIGHT/2) - radius - 12
     DISPLAYSURF.blit(text, textrect)
+
+    # MAP & CHANGE FOCUS
     
 
 # ==================================================
