@@ -181,7 +181,7 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK):
 
     ### RETICLE ###
     radius = int(round(FocusBody.Diameter*KM2PIX/2) + 5)
-    pygame.draw.circle(DISPLAYSURF, WHITE, (round(SURF_WIDTH/2), round(SURF_HEIGHT/2)), radius, 1)
+    pygame.draw.circle(DISPLAYSURF, WHITE, (int(round(SURF_WIDTH/2)), int(round(SURF_HEIGHT/2))), radius, 1)
     pygame.draw.polygon(DISPLAYSURF, WHITE, ((round(SURF_WIDTH/2) - 3, round(SURF_HEIGHT/2) - radius), (round(SURF_WIDTH/2), round(SURF_HEIGHT/2) - radius - 5), (round(SURF_WIDTH/2) + 3, round(SURF_HEIGHT/2) - radius)), 1)
     temp = FocusBody.Name
     text = BasicFont.render(temp, True, WHITE)
