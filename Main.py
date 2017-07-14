@@ -36,7 +36,7 @@ def main():
 
     SOI = False
 
-    KM2PIX = 1 #actually Megameters to Pixels
+    KM2PIX = 1.0 #actually Megameters to Pixels
     
     # GAME LOOP
     while True:
