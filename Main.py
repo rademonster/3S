@@ -39,7 +39,7 @@ def main():
     global MAP_LEVEL, MAP_PLANET_INDEX, MAP_SATELLITE_INDEX
     M_LIST0 = [SUN]
     M_LIST1 = [SUN] + PLANETS
-    M_LIST2 = [[SUN], [MERCURY], [VENUS], [EARTH, MOON] , [MARS, PHOBOS, DEIMOS], [JUPITER, IO, EUROPA, GANYMEDE, CALLISTO], [SATURN, RHEA, TITAN], [URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON]]
+    M_LIST2 = [[SUN], [MERCURY], [VENUS], [EARTH, MOON] , [MARS, PHOBOS, DEIMOS], [CERES], [JUPITER, IO, EUROPA, GANYMEDE, CALLISTO], [SATURN, RHEA, TITAN], [URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON], [PLUTO]]
     MAP = [M_LIST0, M_LIST1, M_LIST2]
     MAP_LEVEL = int(0)
     MAP_PLANET_INDEX = int(0)
@@ -206,7 +206,7 @@ def main():
 #   - Displaying TIME_SCALAR
 def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK):
     # SETTING UP FONT
-    path = os.path.relpath('resources/fonts/Cubellan.ttf')
+    path = os.path.abspath('C:/Users/Suleyman/Documents/3S/Cubellan_v_0_7/Cubellan.ttf')
     BasicFont = pygame.font.Font(path, 12)
 
     ### INFORMATION GUI TOP LEFT ###
@@ -505,7 +505,19 @@ def initialize_bodies():
     URANUS = Planet()
     URANUS.define('Uranus', SUN, URANUS_DIA, np.array([URANUS_MASS], dtype = np.float64), 0, np.array([0,UraVel], dtype = np.float64), np.array([URANUS_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, URANUSCLR)
     
-    PLANETS = [MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS]
+    # CERES
+    global CERES
+    CerVel = math.sqrt(G*(SUN_MASS**2)/(CERES_INITIAL_RAD*(CERES_MASS + SUN_MASS)))
+    CERES = Planet()
+    CERES.define('Ceres', SUN, CERES_DIA, np.array([CERES_MASS], dtype = np.float64), 0, np.array([0,CerVel], dtype = np.float64), np.array([CERES_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, CERESCLR)
+
+    # PLUTO
+    global PLUTO
+    PluVel = math.sqrt(G*(SUN_MASS**2)/(PLUTO_AVERAGE_RAD*(PLUTO_MASS + SUN_MASS)))
+    PLUTO = Planet()
+    PLUTO.define('Pluto', SUN, PLUTO_DIA, np.array([PLUTO_MASS], dtype = np.float64), 0, np.array([0,PluVel], dtype = np.float64), np.array([PLUTO_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, PLUTOCLR)
+
+    PLANETS = [MERCURY, VENUS, EARTH, MARS, CERES, JUPITER, SATURN, URANUS, PLUTO]
 
 
     ### CREATING SATELLITES ###
@@ -600,7 +612,7 @@ def initialize_bodies():
 
 
     global ALL_BODIES
-    ALL_BODIES = (SUN, MERCURY, VENUS, EARTH, MOON, MARS, PHOBOS, DEIMOS, JUPITER, IO, EUROPA, GANYMEDE, CALLISTO, SATURN, TITAN, RHEA)
+    ALL_BODIES = (SUN, MERCURY, VENUS, EARTH, MOON, MARS, PHOBOS, DEIMOS, JUPITER, IO, EUROPA, GANYMEDE, CALLISTO, SATURN, TITAN, RHEA, CERES, PLUTO)
 
 
 # CALLING THE PROGRAM
