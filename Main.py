@@ -33,10 +33,21 @@ def main():
     pygame.display.set_caption('Solar System Simulator')
 
     initialize_bodies()
+    
+    FocusBody = SUN
+    # MAP LISTS
+    global MAP_LEVEL, MAP_PLANET_INDEX, MAP_SATELLITE_INDEX
+    M_LIST0 = [SUN]
+    M_LIST1 = [SUN] + PLANETS
+    M_LIST2 = [[MERCURY], [VENUS], [EARTH, MOON] , [MARS, PHOBOS, DEIMOS], [JUPITER, IO, EUROPA, GANYMEDE, CALLISTO], [SATURN, RHEA, TITAN]
+    MAP = [M_LIST0, M_LIST1, M_LIST2]
+    MAP_LEVEL = int(0)
+    MAP_PLANET_INDEX = int(0)
+    MAP_SATELLITE_INDEX = int(0)
 
     SOI = False
 
-    KM2PIX = 1.0 #actually Megameters to Pixels
+    KM2PIX = 1 #actually Megameters to Pixels
     
     # GAME LOOP
     while True:
@@ -52,19 +63,21 @@ def main():
             # KEY INPUT LOOP
             elif event.type == KEYDOWN:
                 
-                # ZOOM INPUT
+                ## ZOOM INPUT ##
                 if event.key == K_SLASH:
+                    # ZOOM IN
                     if KM2PIX >= 1:
                         KM2PIX *= 2
                     else:
                         KM2PIX *= 10
                 elif event.key == K_PERIOD:
+                    # ZOOM OUT
                     if KM2PIX <= 1:
                         KM2PIX /= 10
                     else:
                         KM2PIX /= 2
                     
-                # TIME_SCALAR KEY INPUT
+                ## TIME_SCALAR KEY INPUT ##
                 elif event.key == K_RIGHTBRACKET:
                     if BASIC_LOOP > 1:
                         BASIC_LOOP -= 10
@@ -80,8 +93,63 @@ def main():
                     elif BASIC_LOOP < FPS:
                         BASIC_LOOP += 10
 
-                # MAP / FOCUS KEY INPUT
-                
+
+                ## MAP / FOCUS KEY INPUT ##
+
+                # KEY UP            
+                elif event.key == K_UP and MAP_LEVEL != 0:
+                    MAP_LEVEL -= 1
+                    # ZOOM OUT
+                    if KM2PIX <= 1:
+                        KM2PIX /= 10
+                    else:
+                        KM2PIX /= 2
+                    #print('Level: %s' %MAP_LEVEL)
+                # KEY DOWN
+                elif event.key == K_DOWN and (MAP_PLANET_INDEX > 1 or MAP_LEVEL == 0) and MAP_LEVEL < 2:
+                    MAP_LEVEL += 1
+                    # ZOOM IN
+                    if KM2PIX >= 1:
+                        KM2PIX *= 2
+                    else:
+                        KM2PIX *= 10
+                    # RESET SAT INDEX
+                    if MAP_LEVEL == 2:
+                        MAP_SATELLITE_INDEX = 0
+                    #print('Level: %s' %MAP_LEVEL)
+                # KEY RIGHT
+                elif event.key == K_RIGHT:
+                    if MAP_LEVEL == 1:
+                        MAP_PLANET_INDEX += 1
+                        #print('Planet Index: %s' %MAP_PLANET_INDEX)
+                    elif MAP_LEVEL == 2:
+                        MAP_SATELLITE_INDEX += 1
+                        #print('Sat Index: %s' %MAP_SATELLITE_INDEX)
+                # KEY LEFT
+                elif event.key == K_LEFT:
+                    if MAP_LEVEL == 1:
+                        MAP_PLANET_INDEX -= 1
+                        #print('Planet Index: %s' %MAP_PLANET_INDEX)
+                    elif MAP_LEVEL == 2:
+                        MAP_SATELLITE_INDEX -= 1
+                        #print('Sat Index: %s' %MAP_SATELLITE_INDEX)
+                    
+                        
+                # SETTING FOCUS BODY
+                if MAP_LEVEL == 0:
+                    FocusBody = MAP[MAP_LEVEL][0]
+                elif MAP_LEVEL == 1:
+                    try:
+                        FocusBody = MAP[MAP_LEVEL][MAP_PLANET_INDEX]
+                    except:
+                        MAP_PLANET_INDEX = 0
+                        FocusBody = MAP[MAP_LEVEL][MAP_PLANET_INDEX]
+                else:
+                    try:
+                        FocusBody = MAP[MAP_LEVEL][MAP_PLANET_INDEX - 1][MAP_SATELLITE_INDEX]
+                    except:
+                        MAP_SATELLITE_INDEX = 0
+                        FocusBody = MAP[MAP_LEVEL][MAP_PLANET_INDEX - 1][MAP_SATELLITE_INDEX]
                     
 
 
@@ -391,7 +459,7 @@ def initialize_bodies():
     SUN = Star()
     SUN.define('Sun', SUN_DIA, np.array([SUN_MASS], dtype = np.float64), np.array([0,0], dtype = np.float64), np.array([0,0], dtype = np.float64))
     
-    #STARS = (SUN)
+    #STARS = [SUN]
 
 
     ### CREATING PLANETS ###
@@ -434,7 +502,7 @@ def initialize_bodies():
     SATURN = Planet()
     SATURN.define('Saturn', SUN, SATURN_DIA, np.array([SATURN_MASS], dtype = np.float64), 0, np.array([0,SatVel], dtype = np.float64), np.array([SATURN_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, SATURNCLR)
     
-    PLANETS = (EARTH, MARS, MERCURY, VENUS, JUPITER, SATURN)
+    PLANETS = [EARTH, MARS, MERCURY, VENUS, JUPITER, SATURN]
 
 
     ### CREATING SATELLITES ###
@@ -495,7 +563,7 @@ def initialize_bodies():
     RHEA = Satellite()
     RHEA.define('Rhea', SATURN, RHEA_DIA, np.array([RHEA_MASS], dtype = np.float64), 0, np.array([0,ReVel], dtype = np.float64) + SATURN.Velocity, np.array([RHEA_INITIAL_RAD,0], dtype = np.float64) + SATURN.Position, RHEACLR)
     
-    SATELLITES = (MOON, PHOBOS, DEIMOS, IO, EUROPA, GANYMEDE, CALLISTO, TITAN, RHEA)
+    SATELLITES = [MOON, PHOBOS, DEIMOS, IO, EUROPA, GANYMEDE, CALLISTO, TITAN, RHEA]
 
 
     global ALL_BODIES
