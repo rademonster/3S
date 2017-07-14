@@ -206,7 +206,7 @@ def main():
 #   - Displaying TIME_SCALAR
 def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK):
     # SETTING UP FONT
-    path = os.path.relpath('resources/fonts/Cubellan.ttf')
+    path = os.path.abspath('C:/Users/Suleyman/Documents/3S/Cubellan_v_0_7/Cubellan.ttf')
     BasicFont = pygame.font.Font(path, 12)
 
     ### INFORMATION GUI TOP LEFT ###
@@ -359,7 +359,7 @@ class Star(object):
         CheckYAxis = -(SURF_HEIGHT + self.Diameter*KM2PIX)/2 < MiddlePoint[1] < (SURF_HEIGHT + self.Diameter*KM2PIX)/2
 
         if CheckXAxis and CheckYAxis:
-            pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(MiddlePoint[1] + SURF_HEIGHT/2)), int(KM2PIX*round(self.Diameter/2)), 0)
+            pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*round(self.Diameter/2)), 0)
 
 
 # --------------------------------------------------
