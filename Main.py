@@ -39,7 +39,7 @@ def main():
     global MAP_LEVEL, MAP_PLANET_INDEX, MAP_SATELLITE_INDEX
     M_LIST0 = [SUN]
     M_LIST1 = [SUN] + PLANETS
-    M_LIST2 = [[MERCURY], [VENUS], [EARTH, MOON] , [MARS, PHOBOS, DEIMOS], [JUPITER, IO, EUROPA, GANYMEDE, CALLISTO], [SATURN, RHEA, TITAN]]
+    M_LIST2 = [[SUN], [MERCURY], [VENUS], [EARTH, MOON] , [MARS, PHOBOS, DEIMOS], [JUPITER, IO, EUROPA, GANYMEDE, CALLISTO], [SATURN, RHEA, TITAN], [URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON]]
     MAP = [M_LIST0, M_LIST1, M_LIST2]
     MAP_LEVEL = int(0)
     MAP_PLANET_INDEX = int(0)
@@ -47,7 +47,7 @@ def main():
 
     SOI = False
 
-    KM2PIX = 1 #actually Megameters to Pixels
+    KM2PIX = np.array([1/1000], dtype = np.float64)
     
     # GAME LOOP
     while True:
@@ -63,16 +63,16 @@ def main():
             # KEY INPUT LOOP
             elif event.type == KEYDOWN:
                 
-                ## ZOOM INPUT ##
+               ## ZOOM INPUT ##
                 if event.key == K_SLASH:
                     # ZOOM IN
-                    if KM2PIX >= 1:
+                    if KM2PIX >= 1/10:
                         KM2PIX *= 2
                     else:
                         KM2PIX *= 10
                 elif event.key == K_PERIOD:
                     # ZOOM OUT
-                    if KM2PIX <= 1:
+                    if KM2PIX <= 1/10:
                         KM2PIX /= 10
                     else:
                         KM2PIX /= 2
@@ -95,45 +95,43 @@ def main():
 
 
                 ## MAP / FOCUS KEY INPUT ##
-
                 # KEY UP            
                 elif event.key == K_UP and MAP_LEVEL != 0:
                     MAP_LEVEL -= 1
                     # ZOOM OUT
-                    if KM2PIX <= 1:
+                    if KM2PIX <= 1/10:
                         KM2PIX /= 10
                     else:
                         KM2PIX /= 2
-                    #print('Level: %s' %MAP_LEVEL)
                 # KEY DOWN
-                elif event.key == K_DOWN and (MAP_PLANET_INDEX > 1 or MAP_LEVEL == 0) and MAP_LEVEL < 2:
+                elif event.key == K_DOWN and MAP_LEVEL < 2:
                     MAP_LEVEL += 1
                     # ZOOM IN
-                    if KM2PIX >= 1:
+                    if KM2PIX >= 1/10:
                         KM2PIX *= 2
                     else:
                         KM2PIX *= 10
                     # RESET SAT INDEX
                     if MAP_LEVEL == 2:
                         MAP_SATELLITE_INDEX = 0
-                    #print('Level: %s' %MAP_LEVEL)
                 # KEY RIGHT
                 elif event.key == K_RIGHT:
                     if MAP_LEVEL == 1:
                         MAP_PLANET_INDEX += 1
-                        #print('Planet Index: %s' %MAP_PLANET_INDEX)
                     elif MAP_LEVEL == 2:
                         MAP_SATELLITE_INDEX += 1
-                        #print('Sat Index: %s' %MAP_SATELLITE_INDEX)
                 # KEY LEFT
                 elif event.key == K_LEFT:
                     if MAP_LEVEL == 1:
                         MAP_PLANET_INDEX -= 1
-                        #print('Planet Index: %s' %MAP_PLANET_INDEX)
                     elif MAP_LEVEL == 2:
                         MAP_SATELLITE_INDEX -= 1
-                        #print('Sat Index: %s' %MAP_SATELLITE_INDEX)
-                    
+                
+                # ENSURING POSITIVE INDICES
+                if MAP_PLANET_INDEX < 0:
+                    MAP_PLANET_INDEX = len(M_LIST1) + MAP_PLANET_INDEX
+                if MAP_SATELLITE_INDEX < 0:
+                    MAP_SATELLITE_INDEX = len(MAP[MAP_LEVEL][MAP_PLANET_INDEX]) + MAP_SATELLITE_INDEX
                         
                 # SETTING FOCUS BODY
                 if MAP_LEVEL == 0:
@@ -146,10 +144,11 @@ def main():
                         FocusBody = MAP[MAP_LEVEL][MAP_PLANET_INDEX]
                 else:
                     try:
-                        FocusBody = MAP[MAP_LEVEL][MAP_PLANET_INDEX - 1][MAP_SATELLITE_INDEX]
+                        FocusBody = MAP[MAP_LEVEL][MAP_PLANET_INDEX][MAP_SATELLITE_INDEX]
                     except:
                         MAP_SATELLITE_INDEX = 0
-                        FocusBody = MAP[MAP_LEVEL][MAP_PLANET_INDEX - 1][MAP_SATELLITE_INDEX]
+                        FocusBody = MAP[MAP_LEVEL][MAP_PLANET_INDEX][MAP_SATELLITE_INDEX]
+
                     
 
 
@@ -184,14 +183,13 @@ def main():
         
         
         # FOCUS ON...
-        FocusBody = MARS
         Focus = FocusBody.Position
 
         # RENDERING OBJECTS
         DISPLAYSURF.fill(BGCOLOR)
-        Renderer(KM2PIX, Focus, SOI)
+        Renderer(KM2PIX[0], Focus, SOI)
         Sim_Speed = TIME_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP) if ACTUAL_SCALAR == 0 else ACTUAL_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP)
-        GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK)
+        GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK)
         pygame.display.update()
         
         # IF NOT GOING THROUGH THE LINEAR SCALE, STICK TO 60 FPS LIMIT
@@ -229,8 +227,7 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK):
     DISPLAYSURF.blit(SimSpeedText, (12, 24))
 
     # KM2PIX TEXT
-    scale = 10**3/KM2PIX
-    temp = 'Scale: 1/%i' %scale
+    temp = 'Scale: %s' %KM2PIX
     ScaleText = BasicFont.render(temp, True, WHITE)
     DISPLAYSURF.blit(ScaleText, (12, 36))
 
@@ -502,7 +499,13 @@ def initialize_bodies():
     SATURN = Planet()
     SATURN.define('Saturn', SUN, SATURN_DIA, np.array([SATURN_MASS], dtype = np.float64), 0, np.array([0,SatVel], dtype = np.float64), np.array([SATURN_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, SATURNCLR)
     
-    PLANETS = [EARTH, MARS, MERCURY, VENUS, JUPITER, SATURN]
+    # URANUS
+    global URANUS
+    UraVel = math.sqrt(G*(SUN_MASS**2)/(URANUS_INITIAL_RAD*(URANUS_MASS + SUN_MASS)))
+    URANUS = Planet()
+    URANUS.define('Uranus', SUN, URANUS_DIA, np.array([URANUS_MASS], dtype = np.float64), 0, np.array([0,UraVel], dtype = np.float64), np.array([URANUS_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, URANUSCLR)
+    
+    PLANETS = [MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS]
 
 
     ### CREATING SATELLITES ###
@@ -563,7 +566,37 @@ def initialize_bodies():
     RHEA = Satellite()
     RHEA.define('Rhea', SATURN, RHEA_DIA, np.array([RHEA_MASS], dtype = np.float64), 0, np.array([0,ReVel], dtype = np.float64) + SATURN.Velocity, np.array([RHEA_INITIAL_RAD,0], dtype = np.float64) + SATURN.Position, RHEACLR)
     
-    SATELLITES = [MOON, PHOBOS, DEIMOS, IO, EUROPA, GANYMEDE, CALLISTO, TITAN, RHEA]
+    # MIRANDA
+    global MIRANDA
+    MirVel = math.sqrt(G*(URANUS_MASS**2)/(MIRANDA_INITIAL_RAD*(MIRANDA_MASS + URANUS_MASS)))
+    MIRANDA = Satellite()
+    MIRANDA.define('Miranda', URANUS, MIRANDA_DIA, np.array([MIRANDA_MASS], dtype = np.float64), 0, np.array([0,MirVel], dtype = np.float64) + URANUS.Velocity, np.array([MIRANDA_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, MIRANDACLR)
+
+    # ARIEL
+    global ARIEL
+    AriVel = math.sqrt(G*(URANUS_MASS**2)/(ARIEL_INITIAL_RAD*(ARIEL_MASS + URANUS_MASS)))
+    ARIEL = Satellite()
+    ARIEL.define('Ariel', URANUS, ARIEL_DIA, np.array([ARIEL_MASS], dtype = np.float64), 0, np.array([0,AriVel], dtype = np.float64) + URANUS.Velocity, np.array([ARIEL_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, ARIELCLR)
+
+    # UMBRIEL
+    global UMBRIEL
+    UmbVel = math.sqrt(G*(URANUS_MASS**2)/(UMBRIEL_INITIAL_RAD*(UMBRIEL_MASS + URANUS_MASS)))
+    UMBRIEL = Satellite()
+    UMBRIEL.define('Umbriel', URANUS, UMBRIEL_DIA, np.array([UMBRIEL_MASS], dtype = np.float64), 0, np.array([0,UmbVel], dtype = np.float64) + URANUS.Velocity, np.array([UMBRIEL_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, UMBRIELCLR)
+
+    # TITANIA
+    global TITANIA
+    TiaVel = math.sqrt(G*(URANUS_MASS**2)/(TITANIA_INITIAL_RAD*(TITANIA_MASS + URANUS_MASS)))
+    TITANIA = Satellite()
+    TITANIA.define('Titania', URANUS, TITANIA_DIA, np.array([TITANIA_MASS], dtype = np.float64), 0, np.array([0,TiaVel], dtype = np.float64) + URANUS.Velocity, np.array([TITANIA_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, TITANIACLR)
+
+    # OBERON
+    global OBERON
+    ObeVel = math.sqrt(G*(URANUS_MASS**2)/(OBERON_INITIAL_RAD*(OBERON_MASS + URANUS_MASS)))
+    OBERON = Satellite()
+    OBERON.define('Oberon', URANUS, OBERON_DIA, np.array([OBERON_MASS], dtype = np.float64), 0, np.array([0,ObeVel], dtype = np.float64) + URANUS.Velocity, np.array([OBERON_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, OBERONCLR)
+    
+    SATELLITES = [MOON, PHOBOS, DEIMOS, IO, EUROPA, GANYMEDE, CALLISTO, TITAN, RHEA, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON]
 
 
     global ALL_BODIES
