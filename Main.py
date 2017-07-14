@@ -47,7 +47,7 @@ def main():
 
     SOI = False
 
-    KM2PIX = np.array([1/1000], dtype = np.float64)
+    KM2PIX = np.array([1./1000], dtype = np.float64)
     
     # GAME LOOP
     while True:
