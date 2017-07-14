@@ -206,7 +206,7 @@ def main():
 #   - Displaying TIME_SCALAR
 def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK):
     # SETTING UP FONT
-    path = os.path.abspath('C:/Users/Suleyman/Documents/3S/Cubellan_v_0_7/Cubellan.ttf')
+    path = os.path.abspath('resources/fonts/Cubellan.ttf')
     BasicFont = pygame.font.Font(path, 12)
 
     ### INFORMATION GUI TOP LEFT ###
