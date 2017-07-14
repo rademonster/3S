@@ -12,12 +12,14 @@ DARKGRAY = ( 50,  50,  50)
 BLACK    = (  0,   0,   0)
 NAVYBLUE = ( 60,  60, 100)
 WHITE    = (255, 255, 255)
+WHITERED = (255, 230, 230)
 RED      = (255,   0,   0)
+PALERED  = (255,  75,  75)
 GREEN    = (  0, 255,   0)
 BLUE     = (  0,   0, 255)
-PALEBLUE = ( 50,  50, 255)
+PALEBLUE = ( 75,  75, 255)
 YELLOW   = (255, 255,   0)
-PALEYELLOW=(255, 255, 75)
+PALEYELLOW=(255, 255, 175)
 ORANGE   = (255, 128,   0)
 PURPLE   = (255,   0, 255)
 CYAN     = (  0, 255, 255)
@@ -34,11 +36,11 @@ BGCOLOR = BLACK
 # CONSTANTS
 # 1Exagram = 10^18 Kg
 # 1Kilometer = 10^3 m
-G = np.array([6.67408*(10**-20)], dtype = np.float64)   # Km^3/(Eg*s^2)
-AU = 1.496*(10**8)      # Mm
+G = np.array([6.67408*(10**-2)], dtype = np.float64)   # Km^3/(Eg*s^2)
+AU = 1.496*(10**8)      # Km
 
 # SUN DATA
-SUN_DIA = 1.3914*10**6      # Mm
+SUN_DIA = 1.3914*10**6      # Km
 SUN_MASS = 1.989*10**12     # Eg
 
 # EARTH DATA
@@ -158,3 +160,16 @@ OBERON_DIA = 0.1194*EARTH_DIA   # Km
 OBERON_MASS = 3.014*10**3       # Gg
 OBERON_INITIAL_RAD = 583520     # Km
 OBERONCLR = LIGHTGRAY
+
+# CERES
+CERES_DIA = 473*2               # Km
+CERES_MASS = 9.393*10**2        # Gg
+CERES_INITIAL_RAD = 2.767*AU    # Km
+CERESCLR = WHITE
+
+# PLUTO
+PLUTO_DIA = 0.1868*EARTH_DIA    # Km
+PLUTO_MASS = 1.303*10**4        # Gg
+PLUTO_AVERAGE_RAD = 39.4*AU     # Km
+PLUTO_INITIAL_RAD = 49.301*AU   # Km
+PLUTOCLR = WHITERED
