@@ -4,7 +4,7 @@ Solar System Simulator (3S)
 Soren Rademacher, Suleyman Barthe-Sukhera
 # Original Concept by
 Soren Rademacher
-# UI and Design by
-Suleyman Barthe-Sukhera
+# UI, Design, and Programming by
+Suleyman Barthe-Sukhera, Soren Rademacher
 # Font by
 Jyrki Ihalainen (yardan74@gmail.com)
