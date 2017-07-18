@@ -39,7 +39,7 @@ def main():
     global MAP_LEVEL, MAP_PLANET_INDEX, MAP_SATELLITE_INDEX
     M_LIST0 = [SUN]
     M_LIST1 = [SUN] + PLANETS
-    M_LIST2 = [[SUN], [MERCURY], [VENUS], [EARTH, MOON] , [MARS, PHOBOS, DEIMOS], [JUPITER, IO, EUROPA, GANYMEDE, CALLISTO], [SATURN, RHEA, TITAN], [URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON]]
+    M_LIST2 = [[SUN], [MERCURY], [VENUS], [EARTH, MOON] , [MARS, PHOBOS, DEIMOS], [CERES], [JUPITER, IO, EUROPA, GANYMEDE, CALLISTO], [SATURN, RHEA, TITAN], [URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON], [PLUTO]]
     MAP = [M_LIST0, M_LIST1, M_LIST2]
     MAP_LEVEL = int(0)
     MAP_PLANET_INDEX = int(0)
@@ -47,7 +47,7 @@ def main():
 
     SOI = False
 
-    KM2PIX = np.array([1/1000], dtype = np.float64)
+    KM2PIX = np.array([1./1000], dtype = np.float64)
     
     # GAME LOOP
     while True:
@@ -174,7 +174,6 @@ def main():
 
         # GOD MODE
         elif GOD_LOOP > 1:
-            print('GOD MODE ENGAGED')
             for x in range(0, GOD_LOOP):
                 PhysicsEngine(TIME_SCALAR)
         
@@ -206,7 +205,7 @@ def main():
 #   - Displaying TIME_SCALAR
 def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK):
     # SETTING UP FONT
-    path = os.path.relpath('resources/fonts/Cubellan.ttf')
+    path = os.path.abspath('resources/fonts/Cubellan.ttf')
     BasicFont = pygame.font.Font(path, 12)
 
     ### INFORMATION GUI TOP LEFT ###
@@ -288,6 +287,7 @@ def PhysicsEngine(TIME_SCALAR):
         # DOING SATELLITE CALCS BASED ON PLANET IT ORBITS
         if bodyA.Is == 'Satellite':
             for bodyB in ALL_BODIES:
+                # IF bodyB IS NOT bodyA AND (bodyB ORBITS SAME PLANET AS bodyA OR bodyA ORBITS bodyB OR bodyB IS A STAR)
                 if bodyA != bodyB and (bodyB.Orbits == bodyA.Orbits or bodyB == bodyA.Orbits or bodyB.Is == 'Star'):
                     DistanceArray = bodyB.Position - bodyA.Position
                     Distance = np.linalg.norm(bodyB.Position - bodyA.Position)
@@ -359,7 +359,7 @@ class Star(object):
         CheckYAxis = -(SURF_HEIGHT + self.Diameter*KM2PIX)/2 < MiddlePoint[1] < (SURF_HEIGHT + self.Diameter*KM2PIX)/2
 
         if CheckXAxis and CheckYAxis:
-            pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(MiddlePoint[1] + SURF_HEIGHT/2)), int(KM2PIX*round(self.Diameter/2)), 0)
+            pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*round(self.Diameter/2)), 0)
 
 
 # --------------------------------------------------
@@ -505,7 +505,19 @@ def initialize_bodies():
     URANUS = Planet()
     URANUS.define('Uranus', SUN, URANUS_DIA, np.array([URANUS_MASS], dtype = np.float64), 0, np.array([0,UraVel], dtype = np.float64), np.array([URANUS_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, URANUSCLR)
     
-    PLANETS = [MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS]
+    # CERES
+    global CERES
+    CerVel = math.sqrt(G*(SUN_MASS**2)/(CERES_INITIAL_RAD*(CERES_MASS + SUN_MASS)))
+    CERES = Planet()
+    CERES.define('Ceres', SUN, CERES_DIA, np.array([CERES_MASS], dtype = np.float64), 0, np.array([0,CerVel], dtype = np.float64), np.array([CERES_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, CERESCLR)
+
+    # PLUTO
+    global PLUTO
+    PluVel = math.sqrt(G*(SUN_MASS**2)/(PLUTO_AVERAGE_RAD*(PLUTO_MASS + SUN_MASS)))
+    PLUTO = Planet()
+    PLUTO.define('Pluto', SUN, PLUTO_DIA, np.array([PLUTO_MASS], dtype = np.float64), 0, np.array([0,PluVel], dtype = np.float64), np.array([PLUTO_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, PLUTOCLR)
+
+    PLANETS = [MERCURY, VENUS, EARTH, MARS, CERES, JUPITER, SATURN, URANUS, PLUTO]
 
 
     ### CREATING SATELLITES ###
@@ -600,7 +612,7 @@ def initialize_bodies():
 
 
     global ALL_BODIES
-    ALL_BODIES = (SUN, MERCURY, VENUS, EARTH, MOON, MARS, PHOBOS, DEIMOS, JUPITER, IO, EUROPA, GANYMEDE, CALLISTO, SATURN, TITAN, RHEA)
+    ALL_BODIES = (SUN, MERCURY, VENUS, EARTH, MOON, MARS, PHOBOS, DEIMOS, CERES, JUPITER, IO, EUROPA, GANYMEDE, CALLISTO, SATURN, TITAN, RHEA, URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON, PLUTO)
 
 
 # CALLING THE PROGRAM
