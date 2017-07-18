@@ -174,7 +174,6 @@ def main():
 
         # GOD MODE
         elif GOD_LOOP > 1:
-            print('GOD MODE ENGAGED')
             for x in range(0, GOD_LOOP):
                 PhysicsEngine(TIME_SCALAR)
         
@@ -288,6 +287,7 @@ def PhysicsEngine(TIME_SCALAR):
         # DOING SATELLITE CALCS BASED ON PLANET IT ORBITS
         if bodyA.Is == 'Satellite':
             for bodyB in ALL_BODIES:
+                # IF bodyB IS NOT bodyA AND (bodyB ORBITS SAME PLANET AS bodyA OR bodyA ORBITS bodyB OR bodyB IS A STAR)
                 if bodyA != bodyB and (bodyB.Orbits == bodyA.Orbits or bodyB == bodyA.Orbits or bodyB.Is == 'Star'):
                     DistanceArray = bodyB.Position - bodyA.Position
                     Distance = np.linalg.norm(bodyB.Position - bodyA.Position)
@@ -612,7 +612,8 @@ def initialize_bodies():
 
 
     global ALL_BODIES
-    ALL_BODIES = (SUN, MERCURY, VENUS, EARTH, MOON, MARS, PHOBOS, DEIMOS, JUPITER, IO, EUROPA, GANYMEDE, CALLISTO, SATURN, TITAN, RHEA, CERES, PLUTO)
+    ALL_BODIES = (SUN, MERCURY, VENUS, EARTH, MOON, MARS, PHOBOS, DEIMOS, CERES, JUPITER, IO, EUROPA, GANYMEDE, CALLISTO, SATURN, TITAN, RHEA, URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON, PLUTO)
+
 
 
 # CALLING THE PROGRAM
