@@ -39,7 +39,7 @@ def main():
     global MAP_LEVEL, MAP_PLANET_INDEX, MAP_SATELLITE_INDEX
     M_LIST0 = [SUN]
     M_LIST1 = [SUN] + PLANETS
-    M_LIST2 = [[SUN], [MERCURY], [VENUS], [EARTH, MOON] , [MARS, PHOBOS, DEIMOS], [CERES], [JUPITER, IO, EUROPA, GANYMEDE, CALLISTO], [SATURN, RHEA, TITAN], [URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON], [PLUTO]]
+    M_LIST2 = [[SUN], [MERCURY], [VENUS], [EARTH, MOON], [MARS, PHOBOS, DEIMOS], [CERES], [JUPITER, IO, EUROPA, GANYMEDE, CALLISTO], [SATURN, RHEA, TITAN], [URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON], [NEPTUNE, TRITON], [PLUTO, CHARON]]
     MAP = [M_LIST0, M_LIST1, M_LIST2]
     MAP_LEVEL = int(0)
     MAP_PLANET_INDEX = int(0)
@@ -517,7 +517,13 @@ def initialize_bodies():
     PLUTO = Planet()
     PLUTO.define('Pluto', SUN, PLUTO_DIA, np.array([PLUTO_MASS], dtype = np.float64), 0, np.array([0,PluVel], dtype = np.float64), np.array([PLUTO_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, PLUTOCLR)
 
-    PLANETS = [MERCURY, VENUS, EARTH, MARS, CERES, JUPITER, SATURN, URANUS, PLUTO]
+    # NEPTUNE
+    global NEPTUNE
+    NepVel = math.sqrt(G*(SUN_MASS**2)/(NEPTUNE_INITIAL_RAD*(NEPTUNE_MASS + SUN_MASS)))
+    NEPTUNE = Planet()
+    NEPTUNE.define('Neptune', SUN, NEPTUNE_DIA, np.array([NEPTUNE_MASS], dtype = np.float64), 0, np.array([0,NepVel], dtype = np.float64), np.array([NEPTUNE_INITIAL_RAD,0], dtype = np.float64) + SUN.Position, NEPTUNECLR)
+
+    PLANETS = [MERCURY, VENUS, EARTH, MARS, CERES, JUPITER, SATURN, URANUS, NEPTUNE, PLUTO]
 
 
     ### CREATING SATELLITES ###
@@ -607,12 +613,24 @@ def initialize_bodies():
     ObeVel = math.sqrt(G*(URANUS_MASS**2)/(OBERON_INITIAL_RAD*(OBERON_MASS + URANUS_MASS)))
     OBERON = Satellite()
     OBERON.define('Oberon', URANUS, OBERON_DIA, np.array([OBERON_MASS], dtype = np.float64), 0, np.array([0,ObeVel], dtype = np.float64) + URANUS.Velocity, np.array([OBERON_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, OBERONCLR)
+
+    # TRITON
+    global TRITON
+    TriVel = math.sqrt(G*(NEPTUNE_MASS**2)/(-TRITON_INITIAL_RAD*(TRITON_MASS + NEPTUNE_MASS)))
+    TRITON = Satellite()
+    TRITON.define('Triton', NEPTUNE, TRITON_DIA, np.array([TRITON_MASS], dtype = np.float64), 0, np.array([0,TriVel], dtype = np.float64) + NEPTUNE.Velocity, np.array([TRITON_INITIAL_RAD,0], dtype = np.float64) + NEPTUNE.Position, TRITONCLR)
+
+    # CHARON
+    global CHARON
+    CharVel = math.sqrt(G*(PLUTO_MASS**2)/(CHARON_INITIAL_RAD*(CHARON_MASS + PLUTO_MASS)))
+    CHARON = Satellite()
+    CHARON.define('Charon', PLUTO, CHARON_DIA, np.array([CHARON_MASS], dtype = np.float64), 0, np.array([0,CharVel], dtype = np.float64) + PLUTO.Velocity, np.array([CHARON_INITIAL_RAD,0], dtype = np.float64) + PLUTO.Position, CHARONCLR)
     
-    SATELLITES = [MOON, PHOBOS, DEIMOS, IO, EUROPA, GANYMEDE, CALLISTO, TITAN, RHEA, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON]
+    SATELLITES = [MOON, PHOBOS, DEIMOS, IO, EUROPA, GANYMEDE, CALLISTO, TITAN, RHEA, TRITON, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON, CHARON]
 
 
     global ALL_BODIES
-    ALL_BODIES = (SUN, MERCURY, VENUS, EARTH, MOON, MARS, PHOBOS, DEIMOS, CERES, JUPITER, IO, EUROPA, GANYMEDE, CALLISTO, SATURN, TITAN, RHEA, URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON, PLUTO)
+    ALL_BODIES = (SUN, MERCURY, VENUS, EARTH, MOON, MARS, PHOBOS, DEIMOS, CERES, JUPITER, IO, EUROPA, GANYMEDE, CALLISTO, SATURN, TITAN, RHEA, NEPTUNE, TRITON, URANUS, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON, PLUTO, CHARON)
 
 
 
