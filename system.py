@@ -92,7 +92,7 @@ if __name__ == "__main__":
 	print "Printing relationships:\n"
 	for b in sys:
 		i = str(b)
-		print i+"'s parent is "+ (b.parent.name if b.parent else "None")
-		print i+"'s children are "+str(b.children)
+		print i+"'s parent is "+ (str(b.getParent()) if b.parent else "None")
+		print i+"'s children are "+str(list(b.getSatelites()))
 		#print i+"'s velocity is "+str(b.velocity)
 

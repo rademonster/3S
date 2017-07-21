@@ -13,6 +13,11 @@ class Body():
 			self.parent.children.append(self)
 
 
+	def getParent(self):
+		return self.parent
+	def getSatelites(self):
+		return iter(self.children)
+
 	def _str(self, depth):
 		rslt = depth*3*" "+self.name
 		for i in self.children:
