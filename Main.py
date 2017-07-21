@@ -45,7 +45,7 @@ def main():
     MAP_PLANET_INDEX = int(0)
     MAP_SATELLITE_INDEX = int(0)
 
-    SOI = False
+    SOI = True
 
     KM2PIX = np.array([1./1000], dtype = np.float64)
     
@@ -277,50 +277,25 @@ def PhysicsEngine(TIME_SCALAR):
 
     for bodyA in ALL_BODIES:
 
-        # ONLY CALCULATE IF IT ORBITS PARENT OR IS ON SAME LEVEL AS OTHER CHILDREN
-        #for bodyB in ALL_BODIES:
-        #    if bodyB == bodyA.Parent or 
+        # ONLY CALCULATE IF :
+        #   - IT ORBITS PARENT
+        #   - bodyB IS A STAR
+        #   GOT RID OF -> IS ON SAME LEVEL AS OTHER CHILDREN <- REQUIREMENT, IS USELESS AND SOI PROVES IT
+        for bodyB in ALL_BODIES:
+            if bodyB != bodyA and (bodyB.Is == 'Star' or bodyB == bodyA.Parent):
+                DistanceArray = bodyB.Position - bodyA.Position
+                Distance = np.linalg.norm(bodyB.Position - bodyA.Position)
+                angle = math.atan(DistanceArray[1]/DistanceArray[0])
+                GForce = TIME_SCALAR*G*bodyB.Mass[0]/(Distance*Distance)
+                if bodyA.Position[0] > bodyB.Position[0]:
+                    ForceX = -math.cos(angle)*GForce[0]
+                    ForceY = -math.sin(angle)*GForce[0]
+                else:
+                    ForceX = math.cos(angle)*GForce[0]
+                    ForceY = math.sin(angle)*GForce[0]
 
-        # DOING SATELLITE CALCS BASED ON PLANET IT ORBITS
-        if bodyA.Is == 'Satellite':
-            for bodyB in ALL_BODIES:
-                # IF bodyB IS NOT bodyA AND (bodyB ORBITS SAME PLANET AS bodyA OR bodyA ORBITS bodyB OR bodyB IS A STAR)
-                if bodyA != bodyB and (bodyB.Orbits == bodyA.Orbits or bodyB == bodyA.Orbits or bodyB.Is == 'Star'):
-                    DistanceArray = bodyB.Position - bodyA.Position
-                    Distance = np.linalg.norm(bodyB.Position - bodyA.Position)
-                    angle = math.atan(DistanceArray[1]/DistanceArray[0])
-                    GForce = TIME_SCALAR*G*bodyB.Mass[0]/(Distance*Distance)
-                    if bodyA.Position[0] > bodyB.Position[0]:
-                        ForceX = -math.cos(angle)*GForce[0]
-                        ForceY = -math.sin(angle)*GForce[0]
-                    else:
-                        ForceX = math.cos(angle)*GForce[0]
-                        ForceY = math.sin(angle)*GForce[0]
+                bodyA.Velocity = bodyA.Velocity + np.array([ForceX,ForceY])
 
-                    bodyA.Velocity = bodyA.Velocity + np.array([ForceX,ForceY])
-
-
-        # DOING PLANETS AND STAR
-        else:
-            for bodyB in ALL_BODIES:
-                # IF bodyB IS A SAT AND DOES NOT ORBIT bodyA, IGNORE!
-                # IF bodyB IS A SAT AND bodyA IS SUN, IGNORE!
-                # BUT, bodyA AND bodyB ARE PLANETS, CALCULATE
-                if bodyA != bodyB and (bodyB.Orbits != bodyA or bodyB.Is == 'Planet'):
-                    DistanceArray = bodyB.Position - bodyA.Position
-                    Distance = np.linalg.norm(bodyB.Position - bodyA.Position)
-                    angle = math.atan(DistanceArray[1]/DistanceArray[0])
-                    GForce = np.array([TIME_SCALAR*G*bodyB.Mass[0]/(Distance*Distance)], dtype = np.float64)
-                    GForce = GForce[0]
-                    if bodyA.Position[0] > bodyB.Position[0]:
-                        Force = np.array([-math.cos(angle)*GForce[0], -math.sin(angle)*GForce[0]], dtype = np.float64)
-                    else:
-                        Force = np.array([math.cos(angle)*GForce[0],math.sin(angle)*GForce[0]], dtype = np.float64)
-
-                    bodyA.Velocity = bodyA.Velocity + Force
-                        
-                    if bodyA.Is == 'Planet':
-                        bodyA.theta = angle
 
     for body in ALL_BODIES:
         body.Position = body.Position + TIME_SCALAR*body.Velocity
@@ -338,30 +313,31 @@ class Body(object):
         self.Diameter = dia
         self.Mass = np.array([mass], dtype = np.float64)
         self.Color = color
-        self.Orbits = parent
+        self.Parent = parent
         self.Children = []
         self.Is = IS
 
         # IF PARENT EXISTS, ASSUME POSITION AND VELOCITY ARE RELATIVE TO PARENT
         if parent!= None:
-            self.Position = np.array([rad,0], dtype = np.float64) + self.Orbits.Position
+            self.Position = np.array([rad,0], dtype = np.float64) + self.Parent.Position
 
             # ADDING SPHERE OF INFLUENCE IF PARENT EXISTS
-            dist = np.linalg.norm(self.Position - self.Orbits.Position)
-            SOI = dist*((self.Mass/self.Orbits.Mass)**(2/5))
+            dist = np.linalg.norm(self.Position - self.Parent.Position)
+            SOI = dist*((self.Mass/self.Parent.Mass)**(2/5))
             self.SOI = SOI
 
             # IF NO VELOCITY GIVEN, ASSUME CIRCULAR ORBIT,
             # ELSE, ASSUME VELOCITY GIVEN IS RELATIVE TO PARENT
             if vel == None:
-                dist = np.linalg.norm(self.Position - self.Orbits.Position)
-                vel = math.sqrt(G*(self.Orbits.Mass[0]**2)/(dist*(self.Mass[0] + self.Orbits.Mass[0])))
-                self.Velocity = np.array([0,vel], dtype = np.float64) + self.Orbits.Velocity
+                dist = np.linalg.norm(self.Position - self.Parent.Position)
+                vel = math.sqrt(G*(self.Parent.Mass[0]**2)/(dist*(self.Mass[0] + self.Parent.Mass[0])))
+                self.Velocity = np.array([0,vel], dtype = np.float64) + self.Parent.Velocity
             else:
-                self.Velocity = np.array([0,vel + self.Orbits.Velocity[1]], dtype = np.float64)
+                self.Velocity = np.array([0,vel + self.Parent.Velocity[1]], dtype = np.float64)
         else:
             self.Position = np.array([rad,0], dtype = np.float64)
             self.Velocity = np.array([0,vel], dtype = np.float64)
+            self.SOI = None
 
 
     # ADDERS
@@ -392,8 +368,8 @@ class Body(object):
         if CheckXAxis and CheckYAxis:
             pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*round(self.Diameter/2)), 0)
             
-            #if SOI and self.SOI*KM2PIX > 1:
-            #    pygame.draw.circle(DISPLAYSURF, WHITE, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(self.SOI*KM2PIX), 1)
+            if SOI and self.SOI != None and self.SOI*KM2PIX > 1:
+                pygame.draw.circle(DISPLAYSURF, WHITE, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(self.SOI*KM2PIX), 1)
 
             
 
