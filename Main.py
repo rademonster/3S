@@ -4,7 +4,7 @@ import pygame, math, sys, os
 import numpy as np
 from pygame.locals import *
 from BackEndData import *
-
+from Body import *
 
 ##################################################################################
 ############# MAIN PROGRAM ##############
@@ -186,7 +186,7 @@ def main():
 
         # RENDERING OBJECTS
         DISPLAYSURF.fill(BGCOLOR)
-        Renderer(KM2PIX[0], Focus, SOI)
+        Renderer(DISPLAYSURF, KM2PIX[0], Focus, SOI)
         Sim_Speed = TIME_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP) if ACTUAL_SCALAR == 0 else ACTUAL_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP)
         GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK, START_UPS_TIC)
         pygame.display.update()
@@ -263,10 +263,10 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 #   - Iterating through all Stars, Planets, Moons and Calling Display Function
 #   - Zoom
 #   - Conversion of km to pixels
-def Renderer(KM2PIX, Focus, SOI):
+def Renderer(DISPLAYSURF, KM2PIX, Focus, SOI):
 
     for body in ALL_BODIES:
-        body.display(KM2PIX, Focus, SOI)
+        body.display(DISPLAYSURF, KM2PIX, Focus, SOI)
 
 
 # ==================================================
@@ -300,78 +300,6 @@ def PhysicsEngine(TIME_SCALAR):
     for body in ALL_BODIES:
         body.Position = body.Position + TIME_SCALAR*body.Velocity
 
-
-##################################################################################
-######## BODY CREATER ########
-##############################
-
-class Body(object):
-    # INITIALIZING BODY
-    def __init__(self, name, parent, dia, mass, vel, rad, color, IS):
-        print(name)
-        self.Name = name
-        self.Diameter = dia
-        self.Mass = np.array([mass], dtype = np.float64)
-        self.Color = color
-        self.Parent = parent
-        self.Children = []
-        self.Is = IS
-
-        # IF PARENT EXISTS, ASSUME POSITION AND VELOCITY ARE RELATIVE TO PARENT
-        if parent!= None:
-            self.Position = np.array([rad,0], dtype = np.float64) + self.Parent.Position
-
-            # ADDING SPHERE OF INFLUENCE IF PARENT EXISTS
-            dist = np.linalg.norm(self.Position - self.Parent.Position)
-            SOI = dist*((self.Mass/self.Parent.Mass)**(2/5))
-            self.SOI = SOI
-
-            # IF NO VELOCITY GIVEN, ASSUME CIRCULAR ORBIT,
-            # ELSE, ASSUME VELOCITY GIVEN IS RELATIVE TO PARENT
-            if vel == None:
-                dist = np.linalg.norm(self.Position - self.Parent.Position)
-                vel = math.sqrt(G*(self.Parent.Mass[0]**2)/(dist*(self.Mass[0] + self.Parent.Mass[0])))
-                self.Velocity = np.array([0,vel], dtype = np.float64) + self.Parent.Velocity
-            else:
-                self.Velocity = np.array([0,vel + self.Parent.Velocity[1]], dtype = np.float64)
-        else:
-            self.Position = np.array([rad,0], dtype = np.float64)
-            self.Velocity = np.array([0,vel], dtype = np.float64)
-            self.SOI = None
-
-
-    # ADDERS
-    def addChild(self, Child):
-        self.Children.append(Child)
-
-
-    # GETTERS
-    def getChildren(self):
-        return self.Children
-    def getParent(self):
-        return self.Parent
-
-
-    # SYSTEM STUFF
-    
-
-
-    # DISPLAY
-    def display(self, KM2PIX, Focus, SOI):
-        MiddlePoint = KM2PIX*(self.Position - Focus)
-        CheckXAxis = -(SURF_WIDTH + self.Diameter*KM2PIX)/2 < MiddlePoint[0] < (SURF_WIDTH + self.Diameter*KM2PIX)/2
-        CheckYAxis = -(SURF_HEIGHT + self.Diameter*KM2PIX)/2 < MiddlePoint[1] < (SURF_HEIGHT + self.Diameter*KM2PIX)/2
-
-        # ENABLING DISSAPPEARING PLANETS
-        # pixelSize = KM2PIX*self.Diameter/2
-        # if CheckXAxis and CheckYAxis and pixelSize > 0.5
-        if CheckXAxis and CheckYAxis:
-            pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*round(self.Diameter/2)), 0)
-            
-            if SOI and self.SOI != None and self.SOI*KM2PIX > 1:
-                pygame.draw.circle(DISPLAYSURF, WHITE, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(self.SOI*KM2PIX), 1)
-
-            
 
  
 # ==================================================
