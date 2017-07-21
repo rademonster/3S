@@ -158,9 +158,9 @@ def main():
             if ACTUAL_SCALAR == 0 and TIME_SCALAR == 1:
                 PhysicsEngine(TIME_SCALAR)
             elif ACTUAL_SCALAR > TIME_SCALAR:
-                ACTUAL_SCALAR -= 10
+                ACTUAL_SCALAR -= 5
             else:
-                ACTUAL_SCALAR += 10
+                ACTUAL_SCALAR += 5
             PhysicsEngine(ACTUAL_SCALAR)
             
         # BASIC LOOP, FOR WHEN SIM IS BETWEEN 1SEC AND 60SEC
@@ -188,11 +188,11 @@ def main():
         DISPLAYSURF.fill(BGCOLOR)
         Renderer(KM2PIX[0], Focus, SOI)
         Sim_Speed = TIME_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP) if ACTUAL_SCALAR == 0 else ACTUAL_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP)
-        GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK)
+        GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK, START_UPS_TIC)
         pygame.display.update()
         
         # IF NOT GOING THROUGH THE LINEAR SCALE, STICK TO 60 FPS LIMIT
-        if ACTUAL_SCALAR != TIME_SCALAR or ACTUAL_SCALAR == 0:
+        if ACTUAL_SCALAR == TIME_SCALAR or ACTUAL_SCALAR == 0:
             FPSCLOCK.tick(FPS)
 
 
@@ -203,7 +203,7 @@ def main():
 #   - Displaying list of bodies in system
 #   - Displaying current focus point
 #   - Displaying TIME_SCALAR
-def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK):
+def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
     # SETTING UP FONT
     path = os.path.abspath('resources/fonts/Cubellan.ttf')
     BasicFont = pygame.font.Font(path, 12)
@@ -232,12 +232,12 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK):
 
     # UPS/FPS DISPLAY TEXT
     if FPSCLOCK.get_time() > 0:
-        #UPS = int(1000/FPSCLOCK.get_time())
-        #temp = 'UPS: %s' %UPS
-        FPS = int(FPSCLOCK.get_fps())
-        temp = 'FPS: %s' %FPS
-        UPSText = BasicFont.render(temp, True, WHITE)
-        DISPLAYSURF.blit(UPSText, (12, 48))
+        UPS = int(1000/FPSCLOCK.get_time())
+        temp = 'UPS: %s' %UPS
+        #FPS = int(FPSCLOCK.get_fps())
+        #temp = 'FPS: %s' %FPS
+        Text = BasicFont.render(temp, True, WHITE)
+        DISPLAYSURF.blit(Text, (12, 48))
     else:
         UPSText = BasicFont.render('TOO FAST', True, WHITE)
         DISPLAYSURF.blit(UPSText, (12, 48))
@@ -437,6 +437,78 @@ class Satellite(object):
         if CheckXAxis and CheckYAxis:
             pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*round(self.Diameter/2)), 0)
 
+
+# --------------------------------------------------
+# BODY OBJECT
+class Body(object):
+    # INITIALIZING BODY
+    def __init__(self, name, parent, dia, mass, vel, rad, color, IS):
+        print(name)
+        self.Name = name
+        self.Diameter = dia
+        self.Mass = np.array([mass], dtype = np.float64)
+        self.Color = color
+        self.Orbits = parent
+        self.Children = []
+        self.Is = IS
+
+        # IF PARENT EXISTS, ASSUME POSITION AND VELOCITY ARE RELATIVE TO PARENT
+        if parent!= None:
+            self.Position = np.array([rad,0], dtype = np.float64) + self.Orbits.Position
+
+            # ADDING SPHERE OF INFLUENCE IF PARENT EXISTS
+            dist = np.linalg.norm(self.Position - self.Orbits.Position)
+            SOI = dist*((self.Mass/self.Orbits.Mass)**(2/5))
+            self.SOI = SOI
+
+            # IF NO VELOCITY GIVEN, ASSUME CIRCULAR ORBIT,
+            # ELSE, ASSUME VELOCITY GIVEN IS RELATIVE TO PARENT
+            if vel == None:
+                dist = np.linalg.norm(self.Position - self.Orbits.Position)
+                vel = math.sqrt(G*(self.Orbits.Mass[0]**2)/(dist*(self.Mass[0] + self.Orbits.Mass[0])))
+                self.Velocity = np.array([0,vel], dtype = np.float64) + self.Orbits.Velocity
+            else:
+                self.Velocity = np.array([0,vel + self.Orbits.Velocity[1]], dtype = np.float64)
+        else:
+            self.Position = np.array([pos], dtype = np.float64)
+            self.Velocity = np.array([vel], dtype = np.float64)
+
+        
+
+
+    # ADDERS
+    def addChild(Child):
+        self.Children.append[Child]
+
+
+    # GETTERS
+    def getChildren():
+        return self.Children
+    def getParent():
+        return self.Parent
+
+
+    # SYSTEM STUFF
+    
+
+
+    # DISPLAY
+    def display(self, KM2PIX, Focus):#, SOI):
+        MiddlePoint = KM2PIX*(self.Position - Focus)
+        CheckXAxis = -(SURF_WIDTH + self.Diameter*KM2PIX)/2 < MiddlePoint[0] < (SURF_WIDTH + self.Diameter*KM2PIX)/2
+        CheckYAxis = -(SURF_HEIGHT + self.Diameter*KM2PIX)/2 < MiddlePoint[1] < (SURF_HEIGHT + self.Diameter*KM2PIX)/2
+
+        # ENABLING DISSAPPEARING PLANETS
+        # pixelSize = KM2PIX*self.Diameter/2
+        # if CheckXAxis and CheckYAxis and pixelSize > 0.5
+        if CheckXAxis and CheckYAxis:
+            pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*round(self.Diameter/2)), 0)
+            
+            #if SOI and self.SOI*KM2PIX > 1:
+            #    pygame.draw.circle(DISPLAYSURF, WHITE, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(self.SOI*KM2PIX), 1)
+
+            
+
  
 # ==================================================
 # INTIALIZATION METHOD
@@ -527,104 +599,73 @@ def initialize_bodies():
 
 
     ### CREATING SATELLITES ###
-    #(name, orbits, dia, mass, theta, vel, pos, color)
+    # BODY REQUIREMENTS: name, parent, dia, mass, vel, pos, color
+    # SATERLLITE REQUIREMENTS name, orbits, dia, mass, theta, vel, pos, color
     global SATELLITES
     
     # MOON
     global MOON
-    MoonVel = math.sqrt(G*(EARTH_MASS**2)/(MOON_INITIAL_RAD*(MOON_MASS + EARTH_MASS)))
-    MOON = Satellite()
-    MOON.define('Moon', EARTH, MOON_DIA, np.array([MOON_MASS], dtype = np.float64), 0, np.array([0,MoonVel], dtype = np.float64) + EARTH.Velocity, np.array([MOON_INITIAL_RAD,0], dtype = np.float64) + EARTH.Position, WHITE)
+    MOON = Body('Moon', EARTH, MOON_DIA, MOON_MASS, None, MOON_INITIAL_RAD, WHITE, 'Satellite')
 
     # PHOBOS
     global PHOBOS
-    PhobVel = math.sqrt(G*(MARS_MASS**2)/(PHOBOS_INITIAL_RAD*(PHOBOS_MASS + MARS_MASS)))
-    PHOBOS = Satellite()
-    PHOBOS.define('Phobos', MARS, PHOBOS_DIA, np.array([PHOBOS_MASS], dtype = np.float64), 0, np.array([0,PhobVel], dtype = np.float64) + MARS.Velocity, np.array([PHOBOS_INITIAL_RAD,0], dtype = np.float64) + MARS.Position, PHOBOSCLR)
+    PHOBOS = Body('Phobos', MARS, PHOBOS_DIA, PHOBOS_MASS, None, PHOBOS_INITIAL_RAD, PHOBOSCLR, 'Satellite')
 
     # DEIMOS
     global DEIMOS
-    DeimVel = math.sqrt(G*(MARS_MASS**2)/(DEIMOS_INITIAL_RAD*(DEIMOS_MASS + MARS_MASS)))
-    DEIMOS = Satellite()
-    DEIMOS.define('Deimos', MARS, DEIMOS_DIA, np.array([DEIMOS_MASS], dtype = np.float64), 0, np.array([0,DeimVel], dtype = np.float64) + MARS.Velocity, np.array([DEIMOS_INITIAL_RAD,0], dtype = np.float64) + MARS.Position, DEIMOSCLR)
+    DEIMOS = Body('Deimos', MARS, DEIMOS_DIA, DEIMOS_MASS, None, DEIMOS_INITIAL_RAD, DEIMOSCLR, 'Satellite')
 
     # IO
     global IO
-    IoVel = math.sqrt(G*(JUPITER_MASS**2)/(IO_INITIAL_RAD*(IO_MASS + JUPITER_MASS)))
-    IO = Satellite()
-    IO.define('Io', JUPITER, IO_DIA, np.array([IO_MASS], dtype = np.float64), 0, np.array([0,IoVel], dtype = np.float64) + JUPITER.Velocity, np.array([IO_INITIAL_RAD,0], dtype = np.float64) + JUPITER.Position, DEIMOSCLR)
+    IO = Body('Io', JUPITER, IO_DIA, IO_MASS, None, IO_INITIAL_RAD, DEIMOSCLR, 'Satellite')
 
     # EUROPA
     global EUROPA
-    EuroVel = math.sqrt(G*(JUPITER_MASS**2)/(EUROPA_INITIAL_RAD*(EUROPA_MASS + JUPITER_MASS)))
-    EUROPA = Satellite()
-    EUROPA.define('Europa', JUPITER, EUROPA_DIA, np.array([EUROPA_MASS], dtype = np.float64), 0, np.array([0,EuroVel], dtype = np.float64) + JUPITER.Velocity, np.array([EUROPA_INITIAL_RAD,0], dtype = np.float64) + JUPITER.Position, EUROPACLR)
+    EUROPA = Body('Europa', JUPITER, EUROPA_DIA, EUROPA_MASS, None, EUROPA_INITIAL_RAD, EUROPACLR, 'Satellite')
 
     # GANYMEDE
     global GANYMEDE
-    GanyVel = math.sqrt(G*(JUPITER_MASS**2)/(GANYMEDE_INITIAL_RAD*(GANYMEDE_MASS + JUPITER_MASS)))
-    GANYMEDE = Satellite()
-    GANYMEDE.define('Ganymede', JUPITER, GANYMEDE_DIA, np.array([GANYMEDE_MASS], dtype = np.float64), 0, np.array([0,GanyVel], dtype = np.float64) + JUPITER.Velocity, np.array([GANYMEDE_INITIAL_RAD,0], dtype = np.float64) + JUPITER.Position, GANYMEDECLR)
+    GANYMEDE = Body('Ganymede', JUPITER, GANYMEDE_DIA, GANYMEDE_MASS, None, GANYMEDE_INITIAL_RAD, GANYMEDECLR, 'Satellite')
     
     # CALLISTO
     global CALLISTO
-    CalVel = math.sqrt(G*(JUPITER_MASS**2)/(CALLISTO_INITIAL_RAD*(CALLISTO_MASS + JUPITER_MASS)))
-    CALLISTO = Satellite()
-    CALLISTO.define('Callisto', JUPITER, CALLISTO_DIA, np.array([CALLISTO_MASS], dtype = np.float64), 0, np.array([0,CalVel], dtype = np.float64) + JUPITER.Velocity, np.array([CALLISTO_INITIAL_RAD,0], dtype = np.float64) + JUPITER.Position, CALLISTOCLR)
+    CALLISTO = Body('Callisto', JUPITER, CALLISTO_DIA, CALLISTO_MASS, None, CALLISTO_INITIAL_RAD, CALLISTOCLR, 'Satellite')
 
     # TITAN
     global TITAN
-    TitVel = math.sqrt(G*(SATURN_MASS**2)/(TITAN_INITIAL_RAD*(TITAN_MASS + SATURN_MASS)))
-    TITAN = Satellite()
-    TITAN.define('Titan', SATURN, TITAN_DIA, np.array([TITAN_MASS], dtype = np.float64), 0, np.array([0,TitVel], dtype = np.float64) + SATURN.Velocity, np.array([TITAN_INITIAL_RAD,0], dtype = np.float64) + SATURN.Position, TITANCLR)
+    TITAN = Body('Titan', SATURN, TITAN_DIA, TITAN_MASS, None, TITAN_INITIAL_RAD, TITANCLR, 'Satellite')
 
     # RHEA
     global RHEA
-    ReVel = math.sqrt(G*(SATURN_MASS**2)/(RHEA_INITIAL_RAD*(RHEA_MASS + SATURN_MASS)))
-    RHEA = Satellite()
-    RHEA.define('Rhea', SATURN, RHEA_DIA, np.array([RHEA_MASS], dtype = np.float64), 0, np.array([0,ReVel], dtype = np.float64) + SATURN.Velocity, np.array([RHEA_INITIAL_RAD,0], dtype = np.float64) + SATURN.Position, RHEACLR)
+    RHEA = Body('Rhea', SATURN, RHEA_DIA, RHEA_MASS, None, RHEA_INITIAL_RAD, RHEACLR, 'Satellite')
     
     # MIRANDA
     global MIRANDA
-    MirVel = math.sqrt(G*(URANUS_MASS**2)/(MIRANDA_INITIAL_RAD*(MIRANDA_MASS + URANUS_MASS)))
-    MIRANDA = Satellite()
-    MIRANDA.define('Miranda', URANUS, MIRANDA_DIA, np.array([MIRANDA_MASS], dtype = np.float64), 0, np.array([0,MirVel], dtype = np.float64) + URANUS.Velocity, np.array([MIRANDA_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, MIRANDACLR)
+    MIRANDA = Body('Miranda', URANUS, MIRANDA_DIA, MIRANDA_MASS, None, MIRANDA_INITIAL_RAD, MIRANDACLR, 'Satellite')
 
     # ARIEL
     global ARIEL
-    AriVel = math.sqrt(G*(URANUS_MASS**2)/(ARIEL_INITIAL_RAD*(ARIEL_MASS + URANUS_MASS)))
-    ARIEL = Satellite()
-    ARIEL.define('Ariel', URANUS, ARIEL_DIA, np.array([ARIEL_MASS], dtype = np.float64), 0, np.array([0,AriVel], dtype = np.float64) + URANUS.Velocity, np.array([ARIEL_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, ARIELCLR)
+    ARIEL = Body('Ariel', URANUS, ARIEL_DIA, ARIEL_MASS, None, ARIEL_INITIAL_RAD, ARIELCLR, 'Satellite')
 
     # UMBRIEL
     global UMBRIEL
-    UmbVel = math.sqrt(G*(URANUS_MASS**2)/(UMBRIEL_INITIAL_RAD*(UMBRIEL_MASS + URANUS_MASS)))
-    UMBRIEL = Satellite()
-    UMBRIEL.define('Umbriel', URANUS, UMBRIEL_DIA, np.array([UMBRIEL_MASS], dtype = np.float64), 0, np.array([0,UmbVel], dtype = np.float64) + URANUS.Velocity, np.array([UMBRIEL_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, UMBRIELCLR)
+    UMBRIEL = Body('Umbriel', URANUS, UMBRIEL_DIA, UMBRIEL_MASS, None, UMBRIEL_INITIAL_RAD, UMBRIELCLR, 'Satellite')
 
     # TITANIA
     global TITANIA
-    TiaVel = math.sqrt(G*(URANUS_MASS**2)/(TITANIA_INITIAL_RAD*(TITANIA_MASS + URANUS_MASS)))
-    TITANIA = Satellite()
-    TITANIA.define('Titania', URANUS, TITANIA_DIA, np.array([TITANIA_MASS], dtype = np.float64), 0, np.array([0,TiaVel], dtype = np.float64) + URANUS.Velocity, np.array([TITANIA_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, TITANIACLR)
+    TITANIA = Body('Titania', URANUS, TITANIA_DIA, TITANIA_MASS, None, TITANIA_INITIAL_RAD, TITANIACLR, 'Satellite')
 
     # OBERON
     global OBERON
-    ObeVel = math.sqrt(G*(URANUS_MASS**2)/(OBERON_INITIAL_RAD*(OBERON_MASS + URANUS_MASS)))
-    OBERON = Satellite()
-    OBERON.define('Oberon', URANUS, OBERON_DIA, np.array([OBERON_MASS], dtype = np.float64), 0, np.array([0,ObeVel], dtype = np.float64) + URANUS.Velocity, np.array([OBERON_INITIAL_RAD,0], dtype = np.float64) + URANUS.Position, OBERONCLR)
+    OBERON = Body('Oberon', URANUS, OBERON_DIA, OBERON_MASS, None, OBERON_INITIAL_RAD, OBERONCLR, 'Satellite')
 
     # TRITON
     global TRITON
-    TriVel = math.sqrt(G*(NEPTUNE_MASS**2)/(-TRITON_INITIAL_RAD*(TRITON_MASS + NEPTUNE_MASS)))
-    TRITON = Satellite()
-    TRITON.define('Triton', NEPTUNE, TRITON_DIA, np.array([TRITON_MASS], dtype = np.float64), 0, np.array([0,TriVel], dtype = np.float64) + NEPTUNE.Velocity, np.array([TRITON_INITIAL_RAD,0], dtype = np.float64) + NEPTUNE.Position, TRITONCLR)
+    TRITON = Body('Triton', NEPTUNE, TRITON_DIA, TRITON_MASS, None, TRITON_INITIAL_RAD, TRITONCLR, 'Satellite')
 
     # CHARON
     global CHARON
-    CharVel = math.sqrt(G*(PLUTO_MASS**2)/(CHARON_INITIAL_RAD*(CHARON_MASS + PLUTO_MASS)))
-    CHARON = Satellite()
-    CHARON.define('Charon', PLUTO, CHARON_DIA, np.array([CHARON_MASS], dtype = np.float64), 0, np.array([0,CharVel], dtype = np.float64) + PLUTO.Velocity, np.array([CHARON_INITIAL_RAD,0], dtype = np.float64) + PLUTO.Position, CHARONCLR)
+    CHARON = Body('Charon', PLUTO, CHARON_DIA, CHARON_MASS, None, CHARON_INITIAL_RAD, CHARONCLR, 'Satellite')
     
     SATELLITES = [MOON, PHOBOS, DEIMOS, IO, EUROPA, GANYMEDE, CALLISTO, TITAN, RHEA, TRITON, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON, CHARON]
 
