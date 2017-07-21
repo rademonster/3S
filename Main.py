@@ -277,6 +277,10 @@ def PhysicsEngine(TIME_SCALAR):
 
     for bodyA in ALL_BODIES:
 
+        # ONLY CALCULATE IF IT ORBITS PARENT OR IS ON SAME LEVEL AS OTHER CHILDREN
+        #for bodyB in ALL_BODIES:
+        #    if bodyB == bodyA.Parent or 
+
         # DOING SATELLITE CALCS BASED ON PLANET IT ORBITS
         if bodyA.Is == 'Satellite':
             for bodyB in ALL_BODIES:
@@ -323,116 +327,9 @@ def PhysicsEngine(TIME_SCALAR):
 
 
 ##################################################################################
-#### STAR, PLANET, SATELLITE CREATER ####
-#########################################
+######## BODY CREATER ########
+##############################
 
-# --------------------------------------------------
-# STAR OBJECT
-# Handles:
-#   - Creating Stars and Defining Them
-#   - Display Function that decides if it is appropriate to "render" object
-class Star(object):
-    def __init__(self):
-        a = 1+1
-
-    def define(self, name, dia, mass, vel, pos):
-        print(name)
-        self.Name = name
-        self.Diameter = dia
-        self.Mass = mass
-        self.Velocity = vel
-        self.Position = pos
-        self.Color = YELLOW
-        self.Is = 'Star'
-        self.Orbits = 0
-
-    def display(self, KM2PIX, Focus, SOI):
-        MiddlePoint = KM2PIX*(self.Position - Focus)
-        CheckXAxis = -(SURF_WIDTH + self.Diameter*KM2PIX)/2 < MiddlePoint[0] < (SURF_WIDTH + self.Diameter*KM2PIX)/2
-        CheckYAxis = -(SURF_HEIGHT + self.Diameter*KM2PIX)/2 < MiddlePoint[1] < (SURF_HEIGHT + self.Diameter*KM2PIX)/2
-
-        if CheckXAxis and CheckYAxis:
-            pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*round(self.Diameter/2)), 0)
-
-
-# --------------------------------------------------
-# PLANET OBJECT
-# Handles:
-#   - Creating Planets and Defining Them
-#   - Display Function that decides if it is appropriate to "render" object
-class Planet(object):
-    def __init__(self):
-        a = 1+1
-
-    def define(self, name, orbits, dia, mass, theta, vel, pos, color):
-        print(name)
-        self.Name = name
-        self.Orbits = orbits
-        self.Diameter = dia
-        self.Mass = mass
-        self.Theta = theta
-        self.Velocity = vel
-        self.Position = pos
-        self.PrevPosition = pos
-        self.Color = color
-        self.Is = 'Planet'
-        
-        # SPHERE OF INFLUENCE
-        # NOTE: THIS COULD BE PUT IN THE PHYSICS ENGINE, BUT TO AVOID
-        # REDUNDANT RECALCULATIONS, IT IS PUT IN THE DEFINITION
-        ### WARNING ###
-        # SOI IS CURRENTLY AN UN-USED VARIABLE, IMPLEMENTATION WILL
-        # COME WITH PLAYER IMPLEMENTATION
-        Star = self.Orbits
-        DistanceArray = Star.Position - self.Position
-        Distance = math.sqrt((DistanceArray[0]**2) + (DistanceArray[1]**2))
-        SOI = Distance*((self.Mass/Star.Mass)**(2/5))
-        self.SOI = SOI
-        
-    def display(self, KM2PIX, Focus, SOI):
-        MiddlePoint = KM2PIX*(self.Position - Focus)
-        CheckXAxis = -(SURF_WIDTH + self.Diameter*KM2PIX)/2 < MiddlePoint[0] < (SURF_WIDTH + self.Diameter*KM2PIX)/2
-        CheckYAxis = -(SURF_HEIGHT + self.Diameter*KM2PIX)/2 < MiddlePoint[1] < (SURF_HEIGHT + self.Diameter*KM2PIX)/2
-
-        if CheckXAxis and CheckYAxis:
-            pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*round(self.Diameter/2)), 0)
-            
-            if SOI and self.SOI*KM2PIX > 1:
-                pygame.draw.circle(DISPLAYSURF, WHITE, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(self.SOI*KM2PIX), 1)
-
-
-# --------------------------------------------------
-# SATELLITE OBJECT
-# Handles:
-#   - Creating Moons and Defining Them
-# TO COME...- Display Function that decides if it is appropriate to "render" object
-class Satellite(object):
-    def __init__(self):
-        a = 1+1
-
-    def define(self, name, orbits, dia, mass, theta, vel, pos, color):
-        print(name)
-        self.Name = name
-        self.Orbits = orbits
-        self.Diameter = dia
-        self.Mass = mass
-        self.Theta = theta
-        self.Velocity = vel
-        self.Position = pos
-        self.Color = color
-        self.Is = 'Satellite'
-
-    def display(self, KM2PIX, Focus):
-        MiddlePoint = KM2PIX*(self.Position - Focus)
-        CheckXAxis = -(SURF_WIDTH + self.Diameter*KM2PIX)/2 < MiddlePoint[0] < (SURF_WIDTH + self.Diameter*KM2PIX)/2
-        CheckYAxis = -(SURF_HEIGHT + self.Diameter*KM2PIX)/2 < MiddlePoint[1] < (SURF_HEIGHT + self.Diameter*KM2PIX)/2
-
-        if CheckXAxis and CheckYAxis:
-            pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*round(self.Diameter/2)), 0)
-
-
-# --------------------------------------------------
-# BODY OBJECT
 class Body(object):
     # INITIALIZING BODY
     def __init__(self, name, parent, dia, mass, vel, rad, color, IS):
@@ -466,18 +363,16 @@ class Body(object):
             self.Position = np.array([rad,0], dtype = np.float64)
             self.Velocity = np.array([0,vel], dtype = np.float64)
 
-        
-
 
     # ADDERS
-    def addChild(Child):
-        self.Children.append[Child]
+    def addChild(self, Child):
+        self.Children.append(Child)
 
 
     # GETTERS
-    def getChildren():
+    def getChildren(self):
         return self.Children
-    def getParent():
+    def getParent(self):
         return self.Parent
 
 
@@ -578,66 +473,82 @@ def initialize_bodies():
     # MOON
     global MOON
     MOON = Body('Moon', EARTH, MOON_DIA, MOON_MASS, None, MOON_INITIAL_RAD, WHITE, 'Satellite')
+    EARTH.addChild(MOON)
 
     # PHOBOS
     global PHOBOS
     PHOBOS = Body('Phobos', MARS, PHOBOS_DIA, PHOBOS_MASS, None, PHOBOS_INITIAL_RAD, PHOBOSCLR, 'Satellite')
+    MARS.addChild(PHOBOS)
 
     # DEIMOS
     global DEIMOS
     DEIMOS = Body('Deimos', MARS, DEIMOS_DIA, DEIMOS_MASS, None, DEIMOS_INITIAL_RAD, DEIMOSCLR, 'Satellite')
+    MARS.addChild(DEIMOS)
 
     # IO
     global IO
     IO = Body('Io', JUPITER, IO_DIA, IO_MASS, None, IO_INITIAL_RAD, DEIMOSCLR, 'Satellite')
+    JUPITER.addChild(IO)
 
     # EUROPA
     global EUROPA
     EUROPA = Body('Europa', JUPITER, EUROPA_DIA, EUROPA_MASS, None, EUROPA_INITIAL_RAD, EUROPACLR, 'Satellite')
+    JUPITER.addChild(EUROPA)
 
     # GANYMEDE
     global GANYMEDE
     GANYMEDE = Body('Ganymede', JUPITER, GANYMEDE_DIA, GANYMEDE_MASS, None, GANYMEDE_INITIAL_RAD, GANYMEDECLR, 'Satellite')
+    JUPITER.addChild(GANYMEDE)
     
     # CALLISTO
     global CALLISTO
     CALLISTO = Body('Callisto', JUPITER, CALLISTO_DIA, CALLISTO_MASS, None, CALLISTO_INITIAL_RAD, CALLISTOCLR, 'Satellite')
+    JUPITER.addChild(CALLISTO)
 
     # TITAN
     global TITAN
     TITAN = Body('Titan', SATURN, TITAN_DIA, TITAN_MASS, None, TITAN_INITIAL_RAD, TITANCLR, 'Satellite')
+    SATURN.addChild(TITAN)
 
     # RHEA
     global RHEA
     RHEA = Body('Rhea', SATURN, RHEA_DIA, RHEA_MASS, None, RHEA_INITIAL_RAD, RHEACLR, 'Satellite')
+    SATURN.addChild(RHEA)
     
     # MIRANDA
     global MIRANDA
     MIRANDA = Body('Miranda', URANUS, MIRANDA_DIA, MIRANDA_MASS, None, MIRANDA_INITIAL_RAD, MIRANDACLR, 'Satellite')
+    URANUS.addChild(MIRANDA)
 
     # ARIEL
     global ARIEL
     ARIEL = Body('Ariel', URANUS, ARIEL_DIA, ARIEL_MASS, None, ARIEL_INITIAL_RAD, ARIELCLR, 'Satellite')
+    URANUS.addChild(ARIEL)
 
     # UMBRIEL
     global UMBRIEL
     UMBRIEL = Body('Umbriel', URANUS, UMBRIEL_DIA, UMBRIEL_MASS, None, UMBRIEL_INITIAL_RAD, UMBRIELCLR, 'Satellite')
+    URANUS.addChild(UMBRIEL)
 
     # TITANIA
     global TITANIA
     TITANIA = Body('Titania', URANUS, TITANIA_DIA, TITANIA_MASS, None, TITANIA_INITIAL_RAD, TITANIACLR, 'Satellite')
+    URANUS.addChild(TITANIA)
 
     # OBERON
     global OBERON
     OBERON = Body('Oberon', URANUS, OBERON_DIA, OBERON_MASS, None, OBERON_INITIAL_RAD, OBERONCLR, 'Satellite')
+    URANUS.addChild(OBERON)
 
     # TRITON
     global TRITON
     TRITON = Body('Triton', NEPTUNE, TRITON_DIA, TRITON_MASS, None, TRITON_INITIAL_RAD, TRITONCLR, 'Satellite')
+    NEPTUNE.addChild(TRITON)
 
     # CHARON
     global CHARON
     CHARON = Body('Charon', PLUTO, CHARON_DIA, CHARON_MASS, None, CHARON_INITIAL_RAD, CHARONCLR, 'Satellite')
+    PLUTO.addChild(CHARON)
     
     SATELLITES = [MOON, PHOBOS, DEIMOS, IO, EUROPA, GANYMEDE, CALLISTO, TITAN, RHEA, TRITON, MIRANDA, ARIEL, UMBRIEL, TITANIA, OBERON, CHARON]
 
