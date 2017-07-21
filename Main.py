@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # SOLAR SYSTEM SIMULATOR
 
 import pygame, math, sys, os
@@ -211,7 +210,7 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 
     ### INFORMATION GUI TOP LEFT ###
     # BACKGROUND
-    BGCOLOR = DARKGRAY
+    BGCOLOR = clrs.get('DARKGRAY')
     pygame.draw.rect(DISPLAYSURF, BGCOLOR, (10, 10, 120, 54), 0)
     pygame.draw.rect(DISPLAYSURF, WHITE, (7, 7, 126, 60), 1)
     pygame.draw.rect(DISPLAYSURF, WHITE, (4, 4, 132, 66), 1)
@@ -390,7 +389,7 @@ def initialize_bodies():
     
     # SUN
     global SUN
-    SUN = Body('Sun', None, SUN_DIA, SUN_MASS, 0, 0, YELLOW, 'Star')
+    SUN = Body('Sun', None, SUN_DIA, SUN_MASS, 0, 0, clrs.get('YELLOW'), 'Star')
     
     #STARS = [SUN]
 
@@ -401,23 +400,23 @@ def initialize_bodies():
     
     # EARTH
     global EARTH
-    EARTH = Body('Earth', SUN, EARTH_DIA, EARTH_MASS, None, EARTH_INITIAL_RAD, BLUE, 'Planet')
+    EARTH = Body('Earth', SUN, EARTH_DIA, EARTH_MASS, None, EARTH_INITIAL_RAD, clrs.get('BLUE'), 'Planet')
 
     # MARS
     global MARS
-    MARS = Body('Mars', SUN, MARS_DIA, MARS_MASS, None, MARS_INITIAL_RAD, RED, 'Planet')
+    MARS = Body('Mars', SUN, MARS_DIA, MARS_MASS, None, MARS_INITIAL_RAD, clrs.get('RED'), 'Planet')
 
     # MERCURY
     global MERCURY
-    MERCURY = Body('Mercury', SUN, MERCURY_DIA, MERCURY_MASS, None, MERCURY_INITIAL_RAD, WHITE, 'Planet')
+    MERCURY = Body('Mercury', SUN, MERCURY_DIA, MERCURY_MASS, None, MERCURY_INITIAL_RAD, clrs.get('WHITE'), 'Planet')
 
     # VENUS
     global VENUS
-    VENUS = Body('Venus', SUN, VENUS_DIA, VENUS_MASS, None, VENUS_INITIAL_RAD, YELLOW, 'Planet')
+    VENUS = Body('Venus', SUN, VENUS_DIA, VENUS_MASS, None, VENUS_INITIAL_RAD, clrs.get('YELLOW'), 'Planet')
 
     # JUPITER
     global JUPITER
-    JUPITER = Body('Jupiter', SUN, JUPITER_DIA, JUPITER_MASS, None, JUPITER_INITIAL_RAD, ORANGE, 'Planet')
+    JUPITER = Body('Jupiter', SUN, JUPITER_DIA, JUPITER_MASS, None, JUPITER_INITIAL_RAD, clrs.get('ORANGE'), 'Planet')
 
     # SATURN
     global SATURN
@@ -449,7 +448,7 @@ def initialize_bodies():
     
     # MOON
     global MOON
-    MOON = Body('Moon', EARTH, MOON_DIA, MOON_MASS, None, MOON_INITIAL_RAD, WHITE, 'Satellite')
+    MOON = Body('Moon', EARTH, MOON_DIA, MOON_MASS, None, MOON_INITIAL_RAD, clrs.get('WHITE'), 'Satellite')
     EARTH.addChild(MOON)
 
     # PHOBOS
