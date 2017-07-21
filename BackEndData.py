@@ -4,35 +4,31 @@ import numpy as np
 FPS = 60
 SURF_WIDTH = 1200
 SURF_HEIGHT = 700
+BGCOLOR = (0,0,0)
 
-#            R    G    B
-LIGHTGRAY= (175, 175, 175)
-GRAY     = (100, 100, 100)
-DARKGRAY = ( 50,  50,  50)
-BLACK    = (  0,   0,   0)
-NAVYBLUE = ( 60,  60, 100)
-WHITE    = (255, 255, 255)
-WHITERED = (255, 230, 230)
-RED      = (255,   0,   0)
-PALERED  = (255,  75,  75)
-GREEN    = (  0, 255,   0)
-BLUE     = (  0,   0, 255)
-DARKBLUE = (  75, 75, 255)
-PALEBLUE = ( 75,  75, 255)
-YELLOW   = (255, 255,   0)
-PALEYELLOW=(255, 255, 175)
-ORANGE   = (255, 128,   0)
-PURPLE   = (255,   0, 255)
-CYAN     = (  0, 255, 255)
-PHOBOSCLR= (222, 184, 135)
-DEIMOSCLR= (255, 222, 173)
-BROWN    = (255, 240, 220)
-DARKBROWN= (200, 190, 170)
-SUN_COLOR = YELLOW
-EARTH_COLOR = BLUE
-MOON_COLOR = LIGHTGRAY
-MARS_COLOR = RED
-BGCOLOR = BLACK
+clrs = dict(
+	LIGHTGRAY= (175, 175, 175),
+	GRAY     = (100, 100, 100),
+	DARKGRAY = ( 50,  50,  50),
+	BLACK    = (  0,   0,   0),
+	NAVYBLUE = ( 60,  60, 100),
+	WHITE    = (255, 255, 255),
+	WHITERED = (255, 230, 230),
+	RED      = (255,   0,   0),
+	PALERED  = (255,  75,  75),
+	GREEN    = (  0, 255,   0),
+	BLUE     = (  0,   0, 255),
+	PALEBLUE = ( 75,  75, 255),
+	YELLOW   = (255, 255,   0),
+	PALEYELLOW=(255, 255, 175),
+	ORANGE   = (255, 128,   0),
+	PURPLE   = (255,   0, 255),
+	CYAN     = (  0, 255, 255),
+	PHOBOSCLR= (222, 184, 135),
+	DEIMOSCLR= (255, 222, 173),
+	BROWN    = (255, 240, 220),
+	DARKBROWN= (200, 190, 170)
+)
 
 # CONSTANTS
 # 1Exagram = 10^18 Kg
@@ -40,6 +36,11 @@ BGCOLOR = BLACK
 G = np.array([6.67408*(10**-2)], dtype = np.float64)   # Km^3/(Eg*s^2)
 AU = 1.496*(10**8)      # Km
 
+<<<<<<< master
+NAMESPACE = {'G':G,  'AU':AU, "EARTH_DIA":12742, "EARTH_MASS":5.972*10**6, "SUN_MASS":1.989e12}
+exec "import math" in NAMESPACE
+NAMESPACE.update(clrs)
+=======
 # SUN DATA
 SUN_DIA = 1.3914*10**6      # Km
 SUN_MASS = 1.989*10**12     # Eg
@@ -192,3 +193,4 @@ TRITON_DIA = 0.2122*EARTH_DIA   # Km
 TRITON_MASS = 2.14*10**4        # Gg
 TRITON_INITIAL_RAD = -354759    # Km is negative because rotates retrograde
 TRITONCLR = GRAY
+>>>>>>> Developmental
