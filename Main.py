@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # SOLAR SYSTEM SIMULATOR
 
 import pygame, math, sys, os
