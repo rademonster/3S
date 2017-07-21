@@ -2,29 +2,7 @@
 import json, os, math
 import numpy as np
 from BackEndData import NAMESPACE, G
-
-class Body():
-	def __init__(self, name, diameter, mass, radius, velocity, parent = None):
-		self.name = name
-		self.dia = diameter
-		self.mass = mass
-		self.radius = radius
-		self.parent = parent
-		self.velocity = np.array(velocity, dtype = np.float64)
-		self.children = []
-		if self.parent:
-			self.parent.children.append(self)
-
-	def _str(self, depth):
-		rslt = depth*3*" "+self.name
-		for i in self.children:
-			rslt += "\n"+depth*3*" "+i._str(depth+1)
-		return rslt
-	def __str__(self):
-		return self._str(0)
-	def __repr__(self):
-		return self.name
-
+from body import Body
 
 
 class System():
@@ -35,12 +13,9 @@ class System():
 		self._roots = []
 		raw = json.loads(open(path, "r").read())
 		def walk(tree, parent):
-			# print ""
-			# print tree
 			for key in tree:
 				if key in System.reservedWords:
 					continue
-				#print parent, key
 				if not self._checkSpec(key, tree[key]):
 					continue
 				dia = self._formatNumber(tree[key]["dia"])
@@ -51,9 +26,9 @@ class System():
 				else:
 					color = self._evalExpr("WHITE")
 				if "vel" in tree[key]:
-					vel = self._evalExpr(tree[key]["vel"])
+					vel = [0, self._evalExpr(tree[key]["vel"])]
 				elif parent:
-					vel = math.sqrt(G*(parent.mass**2)/(rad*(mass + parent.mass)))
+					vel = [0, math.sqrt(G*(parent.mass**2)/(rad*(mass + parent.mass)))]
 				else:
 					vel = [0,0]
 				b = Body(key, dia, mass, rad, vel, parent)
@@ -62,9 +37,6 @@ class System():
 					self._roots.append(b)
 				walk(tree[key], b)
 		walk(raw, None)
-
-	def getRoots(self):
-		return self._roots
 
 	def _evalExpr(self, exp):
 		if isinstance(exp, unicode) or isinstance(exp, str):
@@ -87,6 +59,13 @@ class System():
 	def __iter__(self):
 		return _sysiter(self._index.iteritems())
 
+	def __getitem__(self, index):
+		return self._index[index]
+
+	def getRoots(self):
+		return self._roots
+
+
 class _sysiter():
 	def __init__(self, it):
 		self.it = it
@@ -102,12 +81,18 @@ class _sysiter():
 if __name__ == "__main__":
 	print("Running system tests")
 	sys = System(os.path.abspath('resources/systems/solar.json'))
-	sun = sys._index["Earth"]
-	print "Printing parents"
+	sun = sys.getRoots()[0]
+	print "System root is", sun
+	print 
+	print "System map:"
+	print sun.show()
+	mars = sys["Mars"]
+	print mars, "has", len(mars.children), "children"
+	print
+	print "Printing relationships:\n"
 	for b in sys:
-		i = b.name
+		i = str(b)
 		print i+"'s parent is "+ (b.parent.name if b.parent else "None")
 		print i+"'s children are "+str(b.children)
-		print i+"'s velocity is "+str(b.velocity)
-	print sys.getRoots()[0]
+		#print i+"'s velocity is "+str(b.velocity)
 
