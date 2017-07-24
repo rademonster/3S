@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import json, os, math
+from collections import OrderedDict
 import numpy as np
 from BackEndData import NAMESPACE, G
 from body import Body
@@ -11,7 +12,7 @@ class System():
 	def __init__(self, path):
 		self._index = {}
 		self._roots = []
-		raw = json.loads(open(path, "r").read())
+		raw = json.loads(open(path, "r").read(), object_pairs_hook=OrderedDict)
 		def walk(tree, parent):
 			for key in tree:
 				if key in System.reservedWords:
@@ -26,12 +27,12 @@ class System():
 				else:
 					color = self._evalExpr("WHITE")
 				if "vel" in tree[key]:
-					vel = [0, self._evalExpr(tree[key]["vel"])]
+					vel = [0, self._evalExpr(tree[key]["vel"])+parent.Velocity[1]]
 				elif parent:
-					vel = [0, math.sqrt(G*(parent.mass**2)/(rad*(mass + parent.mass)))]
+					vel = [0, math.sqrt(G*(parent.Mass**2)/(rad*(mass + parent.Mass)))+parent.Velocity[1]]
 				else:
 					vel = [0,0]
-				b = Body(key, dia, mass, rad, vel, parent)
+				b = Body(key, parent, dia, mass, vel, rad, color, "IS")
 				self._index[key] = b
 				if not parent:
 					self._roots.append(b)
@@ -87,12 +88,12 @@ if __name__ == "__main__":
 	print "System map:"
 	print sun.show()
 	mars = sys["Mars"]
-	print mars, "has", len(mars.children), "children"
+	print mars, "has", len(mars.getChildren()), "children"
 	print
 	print "Printing relationships:\n"
 	for b in sys:
 		i = str(b)
-		print i+"'s parent is "+ (str(b.getParent()) if b.parent else "None")
-		print i+"'s children are "+str(list(b.getSatelites()))
+		print i+"'s parent is "+ (str(b.getParent()) if b.Parent else "None")
+		print i+"'s children are "+str(list(b.getChildren()))
 		#print i+"'s velocity is "+str(b.velocity)
 

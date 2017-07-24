@@ -5,6 +5,18 @@
 		"rad":0,
 		"color":"YELLOW",
 
+		"Mercury":{
+			"dia":"0.3829*EARTH_DIA",
+			"mass":"3.3011*10**5",
+			"rad":"0.45*AU"
+		},
+
+		"Venus":{
+			"dia":"0.9499*EARTH_DIA",
+			"mass":"0.815*EARTH_MASS",
+			"rad":"0.723*AU"
+		},
+
 		"Earth":{
 			"dia":12742,
 			"mass":5.972e6,
@@ -37,19 +49,6 @@
 				"rad":"23460"
 			}
 		},
-
-		"Mercury":{
-			"dia":"0.3829*EARTH_DIA",
-			"mass":"3.3011*10**5",
-			"rad":"0.45*AU"
-		},
-
-		"Venus":{
-			"dia":"0.9499*EARTH_DIA",
-			"mass":"0.815*EARTH_MASS",
-			"rad":"0.723*AU"
-		},
-
 
 		"Jupitor":{
 			"dia":"11.209*EARTH_DIA",
