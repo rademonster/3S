@@ -40,7 +40,7 @@ G = np.array([6.67408*(10**-2)], dtype = np.float64)   # Km^3/(Eg*s^2)
 AU = 1.496*(10**8)      # Km
 
 NAMESPACE = {'G':G,  'AU':AU, "EARTH_DIA":12742, "EARTH_MASS":5.972*10**6, "SUN_MASS":1.989e12}
-exec "import math" in NAMESPACE
+exec("import math", NAMESPACE)
 NAMESPACE.update(clrs)
 
 # # SUN DATA

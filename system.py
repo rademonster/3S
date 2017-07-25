@@ -42,7 +42,7 @@ class System():
 	def _evalExpr(self, exp):
 		if isinstance(exp, unicode) or isinstance(exp, str):
 			ns = NAMESPACE.copy()
-			exec "val="+exp in ns
+			exec("val="+exp, ns)
 			return ns["val"]
 		return exp
 
@@ -58,7 +58,7 @@ class System():
 		return True
 
 	def __iter__(self):
-		return _sysiter(self._index.iteritems())
+		return iter(self._index.values())#_sysiter(self._index.iteritems())
 
 	def __getitem__(self, index):
 		return self._index[index]
@@ -67,33 +67,22 @@ class System():
 		return self._roots
 
 
-class _sysiter():
-	def __init__(self, it):
-		self.it = it
-	def __iter__(self):
-		return self
-	def next(self):
-		return self.it.next()[1]
-	def __next__(self):
-		return self.next()
-
-
 
 if __name__ == "__main__":
 	print("Running system tests")
 	sys = System(os.path.abspath('resources/systems/solar.json'))
 	sun = sys.getRoots()[0]
-	print "System root is", sun
-	print 
-	print "System map:"
-	print sun.show()
+	print("System root is", sun)
+	print()
+	print("System map:")
+	print(sun.show())
 	mars = sys["Mars"]
-	print mars, "has", len(mars.getChildren()), "children"
-	print
-	print "Printing relationships:\n"
+	print(mars, "has", len(mars.getChildren()), "children")
+	print()
+	print("Printing relationships:\n")
 	for b in sys:
 		i = str(b)
-		print i+"'s parent is "+ (str(b.getParent()) if b.Parent else "None")
-		print i+"'s children are "+str(list(b.getChildren()))
+		print(i+"'s parent is "+ (str(b.getParent()) if b.Parent else "None"))
+		print(i+"'s children are "+str(list(b.getChildren())))
 		#print i+"'s velocity is "+str(b.velocity)
 
