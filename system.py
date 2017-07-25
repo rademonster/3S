@@ -40,7 +40,7 @@ class System():
 		walk(raw, None)
 
 	def _evalExpr(self, exp):
-		if isinstance(exp, unicode) or isinstance(exp, str):
+		if isinstance(exp, basestring):
 			ns = NAMESPACE.copy()
 			exec("val="+exp, ns)
 			return ns["val"]
