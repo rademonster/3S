@@ -217,9 +217,9 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 
 
 	# RETICLE
-	radius = int(round(FocusBody.Diameter*KM2PIX/2) + 5)
-	pygame.draw.circle(DISPLAYSURF, FONT_COLOR, (int(round(SURF_WIDTH/2)), int(round(SURF_HEIGHT/2))), radius, 1)
-	pygame.draw.polygon(DISPLAYSURF, FONT_COLOR, ((round(SURF_WIDTH/2) - 3, round(SURF_HEIGHT/2) - radius), (round(SURF_WIDTH/2), round(SURF_HEIGHT/2) - radius - 5), (round(SURF_WIDTH/2) + 3, round(SURF_HEIGHT/2) - radius)), 1)
+	radius = int((FocusBody.Diameter.round()*KM2PIX/2) + 5)
+	pygame.draw.circle(DISPLAYSURF, FONT_COLOR, (int(round(SURF_WIDTH/2)), int(round(SURF_HEIGHT/2))), int(radius), 1)
+	pygame.draw.polygon(DISPLAYSURF, FONT_COLOR, ((int(SURF_WIDTH/2) - 3, int(SURF_HEIGHT/2) - radius), (int(SURF_WIDTH/2), int(SURF_HEIGHT/2) - radius - 5), (int(SURF_WIDTH/2) + 3, int(SURF_HEIGHT/2) - radius)), 1)
 	temp = FocusBody.Name
 	text = BasicFont.render(temp, True, FONT_COLOR)
 	textrect = text.get_rect()
@@ -284,7 +284,7 @@ def display(self, KM2PIX, Focus, SOI):
 	# pixelSize = KM2PIX*self.Diameter/2
 	# if CheckXAxis and CheckYAxis and pixelSize > 0.5
 	if CheckXAxis and CheckYAxis:
-		pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*round(self.Diameter/2)), 0)
+		pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*(self.Diameter.round()/2)), 0)
 		
 		if SOI and self.SOI != None and self.SOI*KM2PIX > 1:
 			pygame.draw.circle(DISPLAYSURF, FONT_COLOR, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(self.SOI*KM2PIX), 1)

@@ -5,6 +5,13 @@ import numpy as np
 from BackEndData import NAMESPACE, G
 from body import Body
 
+try:
+    unicode = unicode
+except NameError:
+    # 'unicode' is undefined, must be Python 3
+    unicode = str
+    basestring = (str,bytes)
+
 
 class System():
 	requiredWords = ["dia", "mass", "rad"]

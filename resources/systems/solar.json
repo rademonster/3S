@@ -92,20 +92,35 @@
 			"mass":"95.159*EARTH_MASS",
 			"rad":"9.5*AU",
 			"color":"PALEYELLOW",
+			
+			"Rhea":{
+				"dia":"763.8",
+				"mass":"2.3065*10**4",
+				"rad":"527108",
+				"color":"WHITE"
+			},
 
 			"Titan":{
 				"dia":"0.404*EARTH_DIA",
 				"mass":"0.0255*EARTH_MASS",
 				"rad":"1225000",
 				"color":"YELLOW"
-			},
-
-
-			"Rhea":{
-				"dia":"763.8",
-				"mass":"2.3065*10**4",
-				"rad":"527108",
-				"color":"WHITE"
+			}
+			
+		},
+		
+		"Neptune":{
+			"dia":"3.883*EARTH_DIA",
+			"mass":"17.147*EARTH_MASS",
+			"rad":"30*AU",
+			"color":"DARKBLUE",
+			
+			"Triton":{
+				"dia":"0.2122*EARTH_DIA",
+				"mass":"2.14*10**4",
+				"rad":"354759",
+				"vel":"-math.sqrt(G*((17.147*EARTH_MASS)**2)/(354759*(2.14*10**4 + 17.147*EARTH_MASS)))",
+				"color":"GRAY"
 			}
 		},
 
@@ -169,7 +184,14 @@
 			"mass":"1.303*10**4",
 			"rad":"49.301*AU",
 			"vel":"math.sqrt(G*(SUN_MASS**2)/(39.4*AU*(1.303*10**4 + SUN_MASS)))",
-			"color":"WHITERED"
+			"color":"WHITERED",
+			
+			"Charon":{
+				"dia":"606",
+				"mass":"1.586*10**3",
+				"rad":"17536",
+				"color":"WHITERED"
+			}
 		}
 	}
 }
