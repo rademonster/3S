@@ -3,6 +3,7 @@ import numpy as np
 class Body(object):
     # INITIALIZING BODY
     def __init__(self, name, parent, dia, mass, vel, rad, color):
+
         print(name)
         self.Name = name
         self.Diameter = dia
