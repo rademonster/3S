@@ -32,7 +32,7 @@ class System():
 					vel = [0, math.sqrt(G*(parent.Mass**2)/(rad*(mass + parent.Mass)))+parent.Velocity[1]]
 				else:
 					vel = [0,0]
-				b = Body(key, parent, dia, mass, vel, rad, color, "IS")
+				b = Body(key, parent, dia, mass, vel, rad, color)
 				self._index[key] = b
 				if not parent:
 					self._roots.append(b)
