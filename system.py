@@ -3,7 +3,14 @@ import json, os, math
 from collections import OrderedDict
 import numpy as np
 from BackEndData import NAMESPACE, G
-from body import Body
+from Body import Body
+
+try:
+    unicode = unicode
+except NameError:
+    # 'unicode' is undefined, must be Python 3
+    unicode = str
+    basestring = (str,bytes)
 
 try:
     unicode = unicode
