@@ -227,8 +227,45 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 	textrect.centery = round(SURF_HEIGHT/2) - radius - 12
 	DISPLAYSURF.blit(text, textrect)
 
-	# MAP & CHANGE FOCUS
-	
+	# MAP
+	mapDisplay(FocusBody, BasicFont)
+
+
+# DISPLAYS A "MAP" OF SYSTEM
+def mapDisplay(FocusBody, BasicFont):
+	# COMPILE LIST OF TEXTS TO DISPLAY AND THEIR SPACE NEEDED TO DISPLAY
+	LOWKEYCOLOR = clrs["GRAY"]
+	topTexts = []
+	topX = []
+	topY = 10
+	midTexts = []
+	midX = []
+	midY = 17
+	lowTexts = []
+	lowX = []
+	lowY = 24
+
+	# FIRST GETTING PARENT OR ROOTS OF SYSTEM
+	if FocusBody.getParent() in ALL_BODIES.getRoots():
+		for body in ALL_BODIES.getRoots():
+			topTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+			topX.append(topTexts[-1].get_width())
+	elif FocusBody.getParent():
+		body = FocusBody.getParent()
+		topTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+		topX.append(topTexts[-1].get_width())
+
+	# NEXT GETTING OBJECT AND OBJECTS NEXT TO IT
+	if FocusBody in ALL_BODIES.getRoots():
+		for body in ALL_BODIES.getRoots():
+			if body == FocusBody
+				midTexts.append(BasicFont.render(body.Name, True, clrs["WHITE"]))
+			else:
+				midTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+			midX.append(midTexts[-1].get_width())
+	else:
+		
+
 
 # ==================================================
 # RENDERER
