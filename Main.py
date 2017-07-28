@@ -178,7 +178,7 @@ def main():
 #   - Displaying TIME_SCALAR
 def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 	# SETTING UP FONT
-	path = os.path.abspath('resources/fonts/Cubellan.ttf')
+	path = os.path.abspath('resources/fonts/Anonymous.ttf')
 	BasicFont = pygame.font.Font(path, 12)
 
 	### INFORMATION GUI TOP LEFT ###
@@ -240,10 +240,10 @@ def mapDisplay(FocusBody, BasicFont):
 	topY = 10
 	midTexts = []
 	midX = []
-	midY = 17
+	midY = 22
 	lowTexts = []
 	lowX = []
-	lowY = 24
+	lowY = 34
 
 	# FIRST GETTING PARENT OR ROOTS OF SYSTEM
 	if FocusBody.getParent() in ALL_BODIES.getRoots():
@@ -275,7 +275,8 @@ def mapDisplay(FocusBody, BasicFont):
 	if FocusBody.getChildren():
 		for body in FocusBody.getChildren():
 			lowTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
-			lowX.append(lowTexts[-1].get_width)
+			lowX.append(lowTexts[-1].get_width())
+
 
 	# NOW TO DISPLAY EVERYTHING
 	# DISPLAY TOP
@@ -285,13 +286,35 @@ def mapDisplay(FocusBody, BasicFont):
 			textrect.centerx = SURF_WIDTH/2 - sum(topX)/2 + text.get_width()
 			textrect.centery = topY
 			DISPLAYSURF.blit(text, textrect)
+			topX.pop(0)
+			topX.append(-text.get_width())
 	except:
 		if topTexts[-1]:
-			text = topTexts[-1]
+			text = topTexts[0]
 			textrect = topTexts[0].get_rect()
 			textrect.centerx = SURF_WIDTH/2 - sum(topX)/2 + text.get_width()
 			textrect.centery = topY
 			DISPLAYSURF.blit(text, textrect)
+			topX.pop(0)
+			topX.append(-text.get_width())
+
+	# DISPLAY MIDDLE
+	if len(midTexts) > 1:
+		for text in midTexts:
+			textrect = text.get_rect()
+			textrect.centerx = SURF_WIDTH/2 - sum(midX)/2 + text.get_width()
+			textrect.centery = midY
+			DISPLAYSURF.blit(text, textrect)
+			midX.pop(0)
+			midX.append(-text.get_width())
+	else:
+		text = midTexts[0]
+		textrect = text.get_rect()
+		textrect.centerx = SURF_WIDTH/2 - sum(midX)/2 + text.get_width()
+		textrect.centery = midY
+		DISPLAYSURF.blit(text, textrect)
+		midX.pop(0)
+		midX.append(-text.get_width())
 
 
 
