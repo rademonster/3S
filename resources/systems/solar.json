@@ -50,7 +50,7 @@
 			}
 		},
 
-		"Jupitor":{
+		"Jupiter":{
 			"dia":"11.209*EARTH_DIA",
 			"mass":"317.8*EARTH_MASS",
 			"rad":"5.2*AU",
