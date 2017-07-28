@@ -205,10 +205,10 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 
 	# UPS/FPS DISPLAY TEXT
 	if FPSCLOCK.get_time() > 0:
-		UPS = int(1000/FPSCLOCK.get_time())
-		temp = 'UPS: %s' %UPS
-		#FPS = int(FPSCLOCK.get_fps())
-		#temp = 'FPS: %s' %FPS
+		#UPS = int(1000/FPSCLOCK.get_time())
+		#temp = 'UPS: %s' %UPS
+		FPS = int(FPSCLOCK.get_fps())
+		temp = 'FPS: %s' %FPS
 		Text = BasicFont.render(temp, True, FONT_COLOR)
 		DISPLAYSURF.blit(Text, (12, 48))
 	else:
@@ -258,13 +258,42 @@ def mapDisplay(FocusBody, BasicFont):
 	# NEXT GETTING OBJECT AND OBJECTS NEXT TO IT
 	if FocusBody in ALL_BODIES.getRoots():
 		for body in ALL_BODIES.getRoots():
-			if body == FocusBody
+			if body == FocusBody:
 				midTexts.append(BasicFont.render(body.Name, True, clrs["WHITE"]))
 			else:
 				midTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
 			midX.append(midTexts[-1].get_width())
 	else:
-		
+		for body in FocusBody.getParent().getChildren():
+			if body == FocusBody:
+				midTexts.append(BasicFont.render(body.Name, True, clrs["WHITE"]))
+			else:
+				midTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+			midX.append(midTexts[-1].get_width())
+
+	# LASTLY, GET ALL CHILDREN
+	if FocusBody.getChildren():
+		for body in FocusBody.getChildren():
+			lowTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+			lowX.append(lowTexts[-1].get_width)
+
+	# NOW TO DISPLAY EVERYTHING
+	# DISPLAY TOP
+	try:
+		for text in topTexts:
+			textrect = text.get_rect()
+			textrect.centerx = SURF_WIDTH/2 - sum(topX)/2 + text.get_width()
+			textrect.centery = topY
+			DISPLAYSURF.blit(text, textrect)
+	except:
+		if topTexts[-1]:
+			text = topTexts[-1]
+			textrect = topTexts[0].get_rect()
+			textrect.centerx = SURF_WIDTH/2 - sum(topX)/2 + text.get_width()
+			textrect.centery = topY
+			DISPLAYSURF.blit(text, textrect)
+
+
 
 
 # ==================================================
