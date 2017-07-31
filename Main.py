@@ -234,6 +234,7 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 # DISPLAYS A "MAP" OF SYSTEM
 def mapDisplay(FocusBody, BasicFont):
 	# COMPILE LIST OF TEXTS TO DISPLAY AND THEIR SPACE NEEDED TO DISPLAY
+	l2pix = 8 #letter 2 pixel
 	LOWKEYCOLOR = clrs["GRAY"]
 	topTexts = []
 	topX = []
@@ -249,11 +250,10 @@ def mapDisplay(FocusBody, BasicFont):
 	if FocusBody.getParent() in ALL_BODIES.getRoots():
 		for body in ALL_BODIES.getRoots():
 			topTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
-			topX.append(topTexts[-1].get_width())
 	elif FocusBody.getParent():
 		body = FocusBody.getParent()
 		topTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
-		topX.append(topTexts[-1].get_width())
+	topX = len(topTexts)*l2pix
 
 	# NEXT GETTING OBJECT AND OBJECTS NEXT TO IT
 	if FocusBody in ALL_BODIES.getRoots():
@@ -262,59 +262,84 @@ def mapDisplay(FocusBody, BasicFont):
 				midTexts.append(BasicFont.render(body.Name, True, clrs["WHITE"]))
 			else:
 				midTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
-			midX.append(midTexts[-1].get_width())
 	else:
 		for body in FocusBody.getParent().getChildren():
 			if body == FocusBody:
 				midTexts.append(BasicFont.render(body.Name, True, clrs["WHITE"]))
 			else:
 				midTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
-			midX.append(midTexts[-1].get_width())
+	midX = len(midTexts)*l2pix
 
 	# LASTLY, GET ALL CHILDREN
 	if FocusBody.getChildren():
 		for body in FocusBody.getChildren():
 			lowTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
-			lowX.append(lowTexts[-1].get_width())
+	lowX = len(lowTexts)*l2pix
 
 
 	# NOW TO DISPLAY EVERYTHING
 	# DISPLAY TOP
+	X = SURF_WIDTH/2 - topX*len(topTexts)/2
 	try:
-		for text in topTexts:
-			textrect = text.get_rect()
-			textrect.centerx = SURF_WIDTH/2 - sum(topX)/2 + text.get_width()
+		for x in range(0,len(topTexts)):
+			text = topTexts[x]
+			textrect = topTexts[x].get_rect()
+			if x == 0:
+				textrect.centerx = X
+			else:
+				textrect.centerx = X + topX
+				X += topX
 			textrect.centery = topY
 			DISPLAYSURF.blit(text, textrect)
-			topX.pop(0)
-			topX.append(-text.get_width())
 	except:
-		if topTexts[-1]:
+		if len(topTexts) != 0:
 			text = topTexts[0]
 			textrect = topTexts[0].get_rect()
-			textrect.centerx = SURF_WIDTH/2 - sum(topX)/2 + text.get_width()
+			textrect.centerx = SURF_WIDTH/2
 			textrect.centery = topY
 			DISPLAYSURF.blit(text, textrect)
-			topX.pop(0)
-			topX.append(-text.get_width())
 
 	# DISPLAY MIDDLE
+	X = SURF_WIDTH/2 - midX*len(midTexts)/2
 	if len(midTexts) > 1:
-		for text in midTexts:
-			textrect = text.get_rect()
-			textrect.centerx = SURF_WIDTH/2 - sum(midX)/2 + text.get_width()
+		for x in range(0,len(midTexts)):
+			text = midTexts[x]
+			textrect = midTexts[x].get_rect()
+			if x == 0:
+				textrect.centerx = X
+			else:
+				textrect.centerx = X + midX
+				X += midX
 			textrect.centery = midY
 			DISPLAYSURF.blit(text, textrect)
-			midX.pop(0)
-			midX.append(-text.get_width())
 	else:
 		text = midTexts[0]
 		textrect = text.get_rect()
-		textrect.centerx = SURF_WIDTH/2 - sum(midX)/2 + text.get_width()
+		textrect.centerx = SURF_WIDTH/2
 		textrect.centery = midY
 		DISPLAYSURF.blit(text, textrect)
-		midX.pop(0)
-		midX.append(-text.get_width())
+
+	# DISPLAY LOWER LEVEL
+	X = SURF_WIDTH/2 - lowX*len(lowTexts)/2
+	if len(lowTexts) > 1:
+		for x in range(0,len(lowTexts)):
+			text = lowTexts[x]
+			textrect = lowTexts[x].get_rect()
+			if x == 0:
+				textrect.centerx = X
+			else:
+				textrect.centerx = X + lowX
+				X += lowX
+			textrect.centery = lowY
+			DISPLAYSURF.blit(text, textrect)
+	elif len(lowTexts) > 0:
+		text = lowTexts[0]
+		textrect = text.get_rect()
+		textrect.centerx = SURF_WIDTH/2
+		textrect.centery = lowY
+		DISPLAYSURF.blit(text,textrect)
+
+
 
 
 
