@@ -178,7 +178,7 @@ def main():
 #   - Displaying TIME_SCALAR
 def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 	# SETTING UP FONT
-	path = os.path.abspath('resources/fonts/Anonymous.ttf')
+	path = os.path.abspath('resources/fonts/Cubellan.ttf')
 	BasicFont = pygame.font.Font(path, 12)
 
 	### INFORMATION GUI TOP LEFT ###
@@ -234,26 +234,28 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 # DISPLAYS A "MAP" OF SYSTEM
 def mapDisplay(FocusBody, BasicFont):
 	# COMPILE LIST OF TEXTS TO DISPLAY AND THEIR SPACE NEEDED TO DISPLAY
-	l2pix = 8 #letter 2 pixel
+	l2pix = 10 #letter 2 pixel
+	offset = 25
 	LOWKEYCOLOR = clrs["GRAY"]
 	topTexts = []
 	topX = []
 	topY = 10
 	midTexts = []
 	midX = []
-	midY = 22
+	midY = 25
 	lowTexts = []
 	lowX = []
-	lowY = 34
+	lowY = 40
 
 	# FIRST GETTING PARENT OR ROOTS OF SYSTEM
 	if FocusBody.getParent() in ALL_BODIES.getRoots():
 		for body in ALL_BODIES.getRoots():
 			topTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+			topX.append(len(body.Name)*l2pix)
 	elif FocusBody.getParent():
 		body = FocusBody.getParent()
 		topTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
-	topX = len(topTexts)*l2pix
+		topX.append(len(body.Name)*l2pix)
 
 	# NEXT GETTING OBJECT AND OBJECTS NEXT TO IT
 	if FocusBody in ALL_BODIES.getRoots():
@@ -262,50 +264,42 @@ def mapDisplay(FocusBody, BasicFont):
 				midTexts.append(BasicFont.render(body.Name, True, clrs["WHITE"]))
 			else:
 				midTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+			midX.append(len(body.Name)*l2pix)
 	else:
 		for body in FocusBody.getParent().getChildren():
 			if body == FocusBody:
 				midTexts.append(BasicFont.render(body.Name, True, clrs["WHITE"]))
 			else:
 				midTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
-	midX = len(midTexts)*l2pix
-
+			midX.append(len(body.Name)*l2pix)
+	
 	# LASTLY, GET ALL CHILDREN
 	if FocusBody.getChildren():
 		for body in FocusBody.getChildren():
 			lowTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
-	lowX = len(lowTexts)*l2pix
+			if len(FocusBody.getChildren()) > 1:
+				lowX.append(len(body.Name)*l2pix)
 
 
 	# NOW TO DISPLAY EVERYTHING
 	# DISPLAY TOP
-	X = SURF_WIDTH/2 - topX*len(topTexts)/2
-	try:
-		for x in range(0,len(topTexts)):
-			text = topTexts[x]
-			textrect = topTexts[x].get_rect()
-			textrect.centerx = X
-			textrect.centery = topY
-			DISPLAYSURF.blit(text, textrect)
-			X += topX
-	except:
-		if len(topTexts) != 0:
-			text = topTexts[0]
-			textrect = topTexts[0].get_rect()
-			textrect.centerx = SURF_WIDTH/2
-			textrect.centery = topY
-			DISPLAYSURF.blit(text, textrect)
+	if len(topTexts)>0:
+		text = topTexts[0]
+		textrect = topTexts[0].get_rect()
+		textrect.centerx = SURF_WIDTH/2
+		textrect.centery = topY
+		DISPLAYSURF.blit(text, textrect)
 
 	# DISPLAY MIDDLE
-	X = SURF_WIDTH/2 - midX*len(midTexts)/2
+	X = SURF_WIDTH/2 - (sum(midX)+offset*(len(midX)-2))/2
 	if len(midTexts) > 1:
 		for x in range(0,len(midTexts)):
 			text = midTexts[x]
 			textrect = midTexts[x].get_rect()
-			textrect.centerx = X
+			textrect.centerx = X + offset
 			textrect.centery = midY
 			DISPLAYSURF.blit(text, textrect)
-			X += midX
+			X += midX[x] + offset
 	else:
 		text = midTexts[0]
 		textrect = text.get_rect()
@@ -314,15 +308,15 @@ def mapDisplay(FocusBody, BasicFont):
 		DISPLAYSURF.blit(text, textrect)
 
 	# DISPLAY LOWER LEVEL
-	X = SURF_WIDTH/2 - lowX*len(lowTexts)/2
+	X = SURF_WIDTH/2 - (sum(lowX)+offset*(len(lowX)-2))/2
 	if len(lowTexts) > 1:
 		for x in range(0,len(lowTexts)):
 			text = lowTexts[x]
 			textrect = lowTexts[x].get_rect()
-			textrect.centerx = X
+			textrect.centerx = X + offset
 			textrect.centery = lowY
 			DISPLAYSURF.blit(text, textrect)
-			X += lowX
+			X += lowX[x] + offset
 	elif len(lowTexts) > 0:
 		text = lowTexts[0]
 		textrect = text.get_rect()
