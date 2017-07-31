@@ -284,13 +284,10 @@ def mapDisplay(FocusBody, BasicFont):
 		for x in range(0,len(topTexts)):
 			text = topTexts[x]
 			textrect = topTexts[x].get_rect()
-			if x == 0:
-				textrect.centerx = X
-			else:
-				textrect.centerx = X + topX
-				X += topX
+			textrect.centerx = X
 			textrect.centery = topY
 			DISPLAYSURF.blit(text, textrect)
+			X += topX
 	except:
 		if len(topTexts) != 0:
 			text = topTexts[0]
@@ -305,13 +302,10 @@ def mapDisplay(FocusBody, BasicFont):
 		for x in range(0,len(midTexts)):
 			text = midTexts[x]
 			textrect = midTexts[x].get_rect()
-			if x == 0:
-				textrect.centerx = X
-			else:
-				textrect.centerx = X + midX
-				X += midX
+			textrect.centerx = X
 			textrect.centery = midY
 			DISPLAYSURF.blit(text, textrect)
+			X += midX
 	else:
 		text = midTexts[0]
 		textrect = text.get_rect()
@@ -325,13 +319,10 @@ def mapDisplay(FocusBody, BasicFont):
 		for x in range(0,len(lowTexts)):
 			text = lowTexts[x]
 			textrect = lowTexts[x].get_rect()
-			if x == 0:
-				textrect.centerx = X
-			else:
-				textrect.centerx = X + lowX
-				X += lowX
+			textrect.centerx = X
 			textrect.centery = lowY
 			DISPLAYSURF.blit(text, textrect)
+			X += lowX
 	elif len(lowTexts) > 0:
 		text = lowTexts[0]
 		textrect = text.get_rect()
