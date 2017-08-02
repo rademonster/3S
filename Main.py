@@ -379,7 +379,7 @@ def display(self, KM2PIX, Focus, SOI):
 	if CheckXAxis and CheckYAxis:
 		pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*(self.Diameter.round()/2)), 0)
 		
-		if SOI and self.SOI != None and self.SOI*KM2PIX > 1:
+		if SOI and self.SOI != None and self.SOI*KM2PIX > 1 and self.SOI*KM2PIX < SURF_WIDTH:
 			pygame.draw.circle(DISPLAYSURF, FONT_COLOR, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(self.SOI*KM2PIX), 1)
 
 
