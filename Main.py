@@ -34,6 +34,11 @@ def main():
 	DISPLAYSURF = pygame.display.set_mode((SURF_WIDTH, SURF_HEIGHT))
 	pygame.display.set_caption('Solar System Simulator')
 
+	# SETTING UP FONT
+	filename = 'Cubellan.ttf'
+	path = resource_path(os.path.join('resources/fonts/', filename))
+	BasicFont = pygame.font.Font(path, 12)
+
 	# INITIALIZE ALL BODIES
 	initialize_bodies()
 	
@@ -162,7 +167,7 @@ def main():
 		DISPLAYSURF.fill(BGCOLOR)
 		Renderer(KM2PIX[0], Focus, SOI)
 		Sim_Speed = TIME_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP) if ACTUAL_SCALAR == 0 else ACTUAL_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP)
-		GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK, START_UPS_TIC, siblings)
+		GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK, START_UPS_TIC, siblings, BasicFont)
 		pygame.display.update()
 		
 		# IF NOT GOING THROUGH THE LINEAR SCALE, STICK TO 60 FPS LIMIT
@@ -176,10 +181,7 @@ def main():
 #   - Displaying list of bodies in system
 #   - Displaying current focus point
 #   - Displaying TIME_SCALAR
-def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC, siblings):
-	# SETTING UP FONT
-	path = os.path.abspath('resources/fonts/Cubellan.ttf')
-	BasicFont = pygame.font.Font(path, 12)
+def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC, siblings, BasicFont):
 
 	### INFORMATION GUI TOP LEFT ###
 	# BACKGROUND
@@ -291,6 +293,23 @@ def display(self, KM2PIX, Focus, SOI):
 			pygame.draw.circle(DISPLAYSURF, FONT_COLOR, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(self.SOI*KM2PIX), 1)
 
 
+ 
+# ==================================================
+# INTIALIZATION METHOD
+# Handles:
+#   - Creating and Defining Stars, Planets, Moons
+#   - Creating Callable lists of Stars, Planets, Moons
+def initialize_bodies():
+	print()
+	print("List of Bodies Created...")
+
+	global ALL_BODIES
+	filename = 'solar.json'
+	path = resource_path(os.path.join('resources/systems/',filename))
+	ALL_BODIES = System(path)
+
+
+
 # DISPLAYS A "MAP" OF SYSTEM
 def mapDisplay(FocusBody, BasicFont, siblings):
 	# COMPILE LIST OF TEXTS TO DISPLAY AND THEIR SPACE NEEDED TO DISPLAY
@@ -380,6 +399,12 @@ def mapDisplay(FocusBody, BasicFont, siblings):
 		DISPLAYSURF.blit(text,textrect)
 
 
+# WRAPPING
+def resource_path(relative):
+	if hasattr(sys, "_MEIPASS"):
+		return os.path.join(sys._MEIPASS, relative)
+	return os.path.join(relative)
+
 # HANDLE ZOOMING
 def zoomIn(KM2PIX):
 	if KM2PIX >= 1/10:
@@ -395,18 +420,6 @@ def zoomOut(KM2PIX):
 		KM2PIX /= 2
 	return KM2PIX
 
- 
-# ==================================================
-# INTIALIZATION METHOD
-# Handles:
-#   - Creating and Defining Stars, Planets, Moons
-#   - Creating Callable lists of Stars, Planets, Moons
-def initialize_bodies():
-	print()
-	print("List of Bodies Created...")
-
-	global ALL_BODIES
-	ALL_BODIES = System(os.path.abspath('resources/systems/solar.json'))
 
 
 
