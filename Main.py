@@ -100,7 +100,7 @@ def main():
 							PREV_MAP_INDEX = []
 						else:
 							siblings = [FocusBody.getParent()] + FocusBody.getParent().getChildren()
-							PREV_MAP_INDEX.pop()
+							del PREV_MAP_INDEX[-1]
 				# KEY DOWN
 				elif event.key == K_DOWN:
 					if len(FocusBody.getChildren()) > 0:
