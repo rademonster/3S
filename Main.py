@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # SOLAR SYSTEM SIMULATOR
 
+# STARTUP
+print('LOADING...')
+
 import pygame, math, sys, os
 import numpy as np
 from pygame.locals import *
@@ -36,7 +39,7 @@ def main():
 
 	# SETTING UP FONT
 	filename = 'Cubellan.ttf'
-	path = resource_path(os.path.join('resources/fonts/', filename))
+	path = resource_path(os.path.join('resources', filename))
 	BasicFont = pygame.font.Font(path, 12)
 
 	# INITIALIZE ALL BODIES
@@ -305,7 +308,7 @@ def initialize_bodies():
 
 	global ALL_BODIES
 	filename = 'solar.json'
-	path = resource_path(os.path.join('resources/systems/',filename))
+	path = resource_path(os.path.join('resources',filename))
 	ALL_BODIES = System(path)
 
 
