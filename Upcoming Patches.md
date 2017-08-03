@@ -1,4 +1,7 @@
-# UPCOMING PATCHES
-- TopText in Map does not work as expected?
-- Fix moving between bodies and their sats when changing focus
+# UPCOMING MINOR PATCHES
+- Add velocity vectors
+- Display zoom instructions (possibly remap zoom keys to allow for a player)
+
+# PLANNED MAJOR RELEASES
+- Adding a Player
 
