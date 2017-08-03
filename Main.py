@@ -348,7 +348,7 @@ def mapDisplay(FocusBody, BasicFont, siblings):
 		midTexts.append(BasicFont.render(body.Name, True, clrs["WHITE"]))
 	
 	# LASTLY, GET ALL CHILDREN
-	if FocusBody.getChildren() and FocusBody.Name != siblings[0].Name:
+	if FocusBody.getChildren():# and FocusBody.Name != siblings[0].Name:
 		for body in FocusBody.getChildren():
 			lowTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
 			if len(FocusBody.getChildren()) > 1:
