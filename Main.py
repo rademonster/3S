@@ -51,9 +51,9 @@ def main():
 	MAP_INDEX = 0
 	siblings = ALL_BODIES.getRoots()
 
-	SOI = True
+	SOI = False
 
-	KM2PIX = np.array([1./1000], dtype = np.float64)
+	KM2PIX = np.array([1./10000], dtype = np.float64)
 	
 	# GAME LOOP
 	while True:
@@ -99,7 +99,7 @@ def main():
 				if event.key == K_UP:
 					if FocusBody.getParent():
 						# ZOOM OUT
-						KM2PIX = zoomOut(KM2PIX)
+						#KM2PIX = zoomOut(KM2PIX)
 						# UPDATE MAP AND INDEX
 						MAP_INDEX = PREV_MAP_INDEX[-1]
 						FocusBody = FocusBody.getParent()
@@ -113,7 +113,7 @@ def main():
 				elif event.key == K_DOWN:
 					if len(FocusBody.getChildren()) > 0:
 						# ZOOM IN
-						KM2PIX = zoomIn(KM2PIX)
+						#KM2PIX = zoomIn(KM2PIX)
 						# UPDATE MAP AND INDEX
 						PREV_MAP_INDEX.append(MAP_INDEX)
 						MAP_INDEX = 1
@@ -171,6 +171,8 @@ def main():
 		Renderer(KM2PIX[0], Focus, SOI)
 		Sim_Speed = TIME_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP) if ACTUAL_SCALAR == 0 else ACTUAL_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP)
 		GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK, START_UPS_TIC, siblings, BasicFont)
+
+		# UPDATE DISPLAY
 		pygame.display.update()
 		
 		# IF NOT GOING THROUGH THE LINEAR SCALE, STICK TO 60 FPS LIMIT
@@ -188,7 +190,7 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC, siblings, BasicFo
 
 	### INFORMATION GUI TOP LEFT ###
 	# BACKGROUND
-	global BGCOLOR
+	#global BGCOLOR
 	pygame.draw.rect(DISPLAYSURF, GUI_COLOR, (10, 10, 120, 54), 0)
 	pygame.draw.rect(DISPLAYSURF, FONT_COLOR, (7, 7, 126, 60), 1)
 	pygame.draw.rect(DISPLAYSURF, FONT_COLOR, (4, 4, 132, 66), 1)
@@ -219,6 +221,13 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC, siblings, BasicFo
 	else:
 		UPSText = BasicFont.render('TOO FAST', True, FONT_COLOR)
 		DISPLAYSURF.blit(UPSText, (12, 48))
+
+
+	# INSTRUCTION TEXT (English)
+	Inst1txt = BasicFont.render('Arrow keys to change between objects', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst1txt, (12, SURF_HEIGHT/6))
+	Inst2txt = BasicFont.render('[ / ]  to Zoom  In / Out', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst2txt, (12, SURF_HEIGHT/6 + 12))
 
 
 	# RETICLE
