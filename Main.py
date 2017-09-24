@@ -41,6 +41,7 @@ def main():
 	filename = 'Cubellan.ttf'
 	path = resource_path(os.path.join('resources', filename))
 	BasicFont = pygame.font.Font(path, 12)
+	LargerBasicFont = pygame.font.Font(path, 16)
 
 	# INITIALIZE ALL BODIES
 	initialize_bodies()
@@ -170,7 +171,7 @@ def main():
 		DISPLAYSURF.fill(BGCOLOR)
 		Renderer(KM2PIX[0], Focus, SOI)
 		Sim_Speed = TIME_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP) if ACTUAL_SCALAR == 0 else ACTUAL_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP)
-		GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK, START_UPS_TIC, siblings, BasicFont)
+		GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK, START_UPS_TIC, siblings, BasicFont, LargerBasicFont)
 
 		# UPDATE DISPLAY
 		pygame.display.update()
@@ -186,7 +187,7 @@ def main():
 #   - Displaying list of bodies in system
 #   - Displaying current focus point
 #   - Displaying TIME_SCALAR
-def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC, siblings, BasicFont):
+def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC, siblings, BasicFont, LargerBasicFont):
 
 	### INFORMATION GUI TOP LEFT ###
 	# BACKGROUND
@@ -224,10 +225,16 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC, siblings, BasicFo
 
 
 	# INSTRUCTION TEXT (English)
-	Inst1txt = BasicFont.render('Arrow keys to change between objects', True, FONT_COLOR)
+	Inst1txt = LargerBasicFont.render('Arrow keys to change between objects', True, FONT_COLOR)
 	DISPLAYSURF.blit(Inst1txt, (12, SURF_HEIGHT/6))
-	Inst2txt = BasicFont.render('[ / ]  to Zoom  In / Out', True, FONT_COLOR)
-	DISPLAYSURF.blit(Inst2txt, (12, SURF_HEIGHT/6 + 12))
+	Inst2txt = LargerBasicFont.render('Zoom In  . (period)', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst2txt, (12, SURF_HEIGHT/6 + 20))
+	Inst2_1txt = LargerBasicFont.render('Zoom Out  / (forward slash)', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst2_1txt, (12, SURF_HEIGHT/6 + 40))
+	Inst3txt = LargerBasicFont.render('Speed Up  ] (right bracket)', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst3txt, (12, SURF_HEIGHT/6 + 60))
+	Inst4txt = LargerBasicFont.render('Speed Down  [ (left bracsket)', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst4txt, (12, SURF_HEIGHT/6 + 80))
 
 
 	# RETICLE
