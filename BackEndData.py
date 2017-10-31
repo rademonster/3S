@@ -1,6 +1,6 @@
 import numpy as np 
 
-
+# COLOR DICTIONARY
 clrs = dict(
 	LIGHTGRAY= (175, 175, 175),
 	GRAY     = (100, 100, 100),

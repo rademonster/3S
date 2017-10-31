@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # SOLAR SYSTEM SIMULATOR
 
+# STARTUP
+print('LOADING...')
+
 import pygame, math, sys, os
 import numpy as np
 from pygame.locals import *
@@ -34,16 +37,24 @@ def main():
 	DISPLAYSURF = pygame.display.set_mode((SURF_WIDTH, SURF_HEIGHT))
 	pygame.display.set_caption('Solar System Simulator')
 
+	# SETTING UP FONT
+	filename = 'Cubellan.ttf'
+	path = resource_path(os.path.join('resources', filename))
+	BasicFont = pygame.font.Font(path, 12)
+	LargerBasicFont = pygame.font.Font(path, 16)
+
+	# INITIALIZE ALL BODIES
 	initialize_bodies()
 	
+	# FOCUS ON FIRST ROOT
 	FocusBody = ALL_BODIES.getRoots()[0]
-	# MAP LISTS
+	PREV_MAP_INDEX = []
 	MAP_INDEX = 0
 	siblings = ALL_BODIES.getRoots()
 
-	SOI = True
+	SOI = False
 
-	KM2PIX = np.array([1./1000], dtype = np.float64)
+	KM2PIX = np.array([1./10000], dtype = np.float64)
 	
 	# GAME LOOP
 	while True:
@@ -62,16 +73,10 @@ def main():
 			   ## ZOOM INPUT ##
 				if event.key == K_SLASH:
 					# ZOOM IN
-					if KM2PIX >= 1/10:
-						KM2PIX *= 2
-					else:
-						KM2PIX *= 10
+					KM2PIX = zoomIn(KM2PIX)
 				elif event.key == K_PERIOD:
 					# ZOOM OUT
-					if KM2PIX <= 1/10:
-						KM2PIX /= 10
-					else:
-						KM2PIX /= 2
+					KM2PIX = zoomOut(KM2PIX)
 					
 				## TIME_SCALAR KEY INPUT ##
 				elif event.key == K_RIGHTBRACKET:
@@ -94,21 +99,30 @@ def main():
 				# KEY UP            
 				if event.key == K_UP:
 					if FocusBody.getParent():
+						# ZOOM OUT
+						#KM2PIX = zoomOut(KM2PIX)
+						# UPDATE MAP AND INDEX
+						MAP_INDEX = PREV_MAP_INDEX[-1]
 						FocusBody = FocusBody.getParent()
-						MAP_INDEX = 0
 						if not FocusBody.getParent():
 							siblings = (ALL_BODIES.getRoots())
+							PREV_MAP_INDEX = []
 						else:
-							siblings = FocusBody.getParent().getChildren() + [FocusBody.getParent()]
+							siblings = [FocusBody.getParent()] + FocusBody.getParent().getChildren()
+							del PREV_MAP_INDEX[-1]
 				# KEY DOWN
 				elif event.key == K_DOWN:
 					if len(FocusBody.getChildren()) > 0:
+						# ZOOM IN
+						#KM2PIX = zoomIn(KM2PIX)
+						# UPDATE MAP AND INDEX
+						PREV_MAP_INDEX.append(MAP_INDEX)
+						MAP_INDEX = 1
 						FocusBody = FocusBody.getChildren()[0]
-						MAP_INDEX = 0
 						if not FocusBody.getParent():
 							siblings = (ALL_BODIES.getRoots())
 						else:
-							siblings = FocusBody.getParent().getChildren() + [FocusBody.getParent()]
+							siblings = [FocusBody.getParent()] + FocusBody.getParent().getChildren()
 
 				# KEY RIGHT
 				elif event.key == K_RIGHT:
@@ -119,10 +133,6 @@ def main():
 				elif event.key == K_LEFT:
 					MAP_INDEX = (MAP_INDEX-1)%len(siblings)
 					FocusBody = siblings[MAP_INDEX]
-				
-						
-
-					
 
 
 		### RUNNING PHYSICS ENGINE ###
@@ -152,7 +162,7 @@ def main():
 		
 		else:
 			PhysicsEngine(TIME_SCALAR)
-		
+
 		
 		# FOCUS ON...
 		Focus = FocusBody.Position
@@ -161,13 +171,14 @@ def main():
 		DISPLAYSURF.fill(BGCOLOR)
 		Renderer(KM2PIX[0], Focus, SOI)
 		Sim_Speed = TIME_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP) if ACTUAL_SCALAR == 0 else ACTUAL_SCALAR*GOD_LOOP*(FPS+2-BASIC_LOOP)
-		GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK, START_UPS_TIC)
+		GUI(Sim_Speed, FocusBody, KM2PIX[0], FPSCLOCK, START_UPS_TIC, siblings, BasicFont, LargerBasicFont)
+
+		# UPDATE DISPLAY
 		pygame.display.update()
 		
 		# IF NOT GOING THROUGH THE LINEAR SCALE, STICK TO 60 FPS LIMIT
 		if ACTUAL_SCALAR == TIME_SCALAR or ACTUAL_SCALAR == 0:
 			FPSCLOCK.tick(FPS)
-
 
 
 # ==================================================
@@ -176,14 +187,11 @@ def main():
 #   - Displaying list of bodies in system
 #   - Displaying current focus point
 #   - Displaying TIME_SCALAR
-def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
-	# SETTING UP FONT
-	path = os.path.abspath('resources/fonts/Cubellan.ttf')
-	BasicFont = pygame.font.Font(path, 12)
+def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC, siblings, BasicFont, LargerBasicFont):
 
 	### INFORMATION GUI TOP LEFT ###
 	# BACKGROUND
-	global BGCOLOR
+	#global BGCOLOR
 	pygame.draw.rect(DISPLAYSURF, GUI_COLOR, (10, 10, 120, 54), 0)
 	pygame.draw.rect(DISPLAYSURF, FONT_COLOR, (7, 7, 126, 60), 1)
 	pygame.draw.rect(DISPLAYSURF, FONT_COLOR, (4, 4, 132, 66), 1)
@@ -205,10 +213,10 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 
 	# UPS/FPS DISPLAY TEXT
 	if FPSCLOCK.get_time() > 0:
-		UPS = int(1000/FPSCLOCK.get_time())
-		temp = 'UPS: %s' %UPS
-		#FPS = int(FPSCLOCK.get_fps())
-		#temp = 'FPS: %s' %FPS
+		#UPS = int(1000/FPSCLOCK.get_time())
+		#temp = 'UPS: %s' %UPS
+		FPS = int(FPSCLOCK.get_fps())
+		temp = 'FPS: %s' %FPS
 		Text = BasicFont.render(temp, True, FONT_COLOR)
 		DISPLAYSURF.blit(Text, (12, 48))
 	else:
@@ -216,9 +224,22 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 		DISPLAYSURF.blit(UPSText, (12, 48))
 
 
+	# INSTRUCTION TEXT (English)
+	Inst1txt = LargerBasicFont.render('Arrow keys to change between objects', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst1txt, (12, SURF_HEIGHT/6))
+	Inst2txt = LargerBasicFont.render('Zoom In  . (period)', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst2txt, (12, SURF_HEIGHT/6 + 20))
+	Inst2_1txt = LargerBasicFont.render('Zoom Out  / (forward slash)', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst2_1txt, (12, SURF_HEIGHT/6 + 40))
+	Inst3txt = LargerBasicFont.render('Speed Up  ] (right bracket)', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst3txt, (12, SURF_HEIGHT/6 + 60))
+	Inst4txt = LargerBasicFont.render('Speed Down  [ (left bracsket)', True, FONT_COLOR)
+	DISPLAYSURF.blit(Inst4txt, (12, SURF_HEIGHT/6 + 80))
+
+
 	# RETICLE
 	radius = int((FocusBody.Diameter.round()*KM2PIX/2) + 5)
-	pygame.draw.circle(DISPLAYSURF, FONT_COLOR, (int(round(SURF_WIDTH/2)), int(round(SURF_HEIGHT/2))), int(radius), 1)
+	pygame.draw.circle(DISPLAYSURF, FONT_COLOR, (int(SURF_WIDTH/2), int(SURF_HEIGHT/2)), int(radius), 1)
 	pygame.draw.polygon(DISPLAYSURF, FONT_COLOR, ((int(SURF_WIDTH/2) - 3, int(SURF_HEIGHT/2) - radius), (int(SURF_WIDTH/2), int(SURF_HEIGHT/2) - radius - 5), (int(SURF_WIDTH/2) + 3, int(SURF_HEIGHT/2) - radius)), 1)
 	temp = FocusBody.Name
 	text = BasicFont.render(temp, True, FONT_COLOR)
@@ -227,8 +248,9 @@ def GUI(Sim_Speed, FocusBody, KM2PIX, FPSCLOCK, START_UPS_TIC):
 	textrect.centery = round(SURF_HEIGHT/2) - radius - 12
 	DISPLAYSURF.blit(text, textrect)
 
-	# MAP & CHANGE FOCUS
-	
+	# MAP DISPLAY
+	mapDisplay(FocusBody, BasicFont, siblings)
+
 
 # ==================================================
 # RENDERER
@@ -286,10 +308,9 @@ def display(self, KM2PIX, Focus, SOI):
 	if CheckXAxis and CheckYAxis:
 		pygame.draw.circle(DISPLAYSURF, self.Color, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(KM2PIX*(self.Diameter.round()/2)), 0)
 		
-		if SOI and self.SOI != None and self.SOI*KM2PIX > 1:
+		if SOI and self.SOI != None and self.SOI*KM2PIX > 1 and self.SOI*KM2PIX < SURF_WIDTH:
 			pygame.draw.circle(DISPLAYSURF, FONT_COLOR, (int(MiddlePoint[0] + SURF_WIDTH/2),int(SURF_HEIGHT/2 - MiddlePoint[1])), int(self.SOI*KM2PIX), 1)
 
-			
 
  
 # ==================================================
@@ -302,7 +323,122 @@ def initialize_bodies():
 	print("List of Bodies Created...")
 
 	global ALL_BODIES
-	ALL_BODIES = System(os.path.abspath('resources/systems/solar.json'))
+	filename = 'solar.json'
+	path = resource_path(os.path.join('resources',filename))
+	ALL_BODIES = System(path)
+
+
+
+# DISPLAYS A "MAP" OF SYSTEM
+def mapDisplay(FocusBody, BasicFont, siblings):
+	# COMPILE LIST OF TEXTS TO DISPLAY AND THEIR SPACE NEEDED TO DISPLAY
+	l2pix = 5 #letter 2 pixel
+	offset = 5
+	LOWKEYCOLOR = clrs["GRAY"]
+	topTexts = []
+	topX = []
+	topY = 10
+	midTexts = []
+	midX = []
+	midY = 25
+	lowTexts = []
+	lowX = []
+	lowY = 40
+
+	# FIRST GETTING PARENT OR ROOTS OF SYSTEM
+	if FocusBody.getParent() in ALL_BODIES.getRoots():
+		for body in ALL_BODIES.getRoots():
+			topTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+			topX.append(len(body.Name)*l2pix)
+	elif FocusBody.getParent():
+		body = FocusBody.getParent()
+		topTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+		topX.append(len(body.Name)*l2pix)
+
+	# NEXT GETTING OBJECT AND OBJECTS NEXT TO IT
+	try:
+		for body in siblings:
+			if body == FocusBody:
+				midTexts.append(BasicFont.render(body.Name, True, clrs["WHITE"]))
+			else:
+				midTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+			midX.append(len(body.Name)*l2pix)
+	except:
+		midTexts.append(BasicFont.render(body.Name, True, clrs["WHITE"]))
+	
+	# LASTLY, GET ALL CHILDREN
+	if FocusBody.getChildren():# and FocusBody.Name != siblings[0].Name:
+		for body in FocusBody.getChildren():
+			lowTexts.append(BasicFont.render(body.Name, True, LOWKEYCOLOR))
+			if len(FocusBody.getChildren()) > 1:
+				lowX.append(len(body.Name)*l2pix)
+
+
+	# NOW TO DISPLAY EVERYTHING
+	# DISPLAY TOP
+	if len(topTexts)>0:
+		text = topTexts[0]
+		textrect = topTexts[0].get_rect()
+		textrect.centerx = SURF_WIDTH/2
+		textrect.centery = topY
+		DISPLAYSURF.blit(text, textrect)
+
+	# DISPLAY MIDDLE
+	X = SURF_WIDTH/2 - sum(midX)
+	if len(midTexts) > 1:
+		for x in range(0,len(midTexts)):
+			text = midTexts[x]
+			textrect = midTexts[x].get_rect()
+			textrect.centerx = X + offset + midX[x]
+			textrect.centery = midY
+			DISPLAYSURF.blit(text, textrect)
+			X += midX[x] + offset + midX[x]
+	else:
+		text = midTexts[0]
+		textrect = text.get_rect()
+		textrect.centerx = SURF_WIDTH/2
+		textrect.centery = midY
+		DISPLAYSURF.blit(text, textrect)
+
+	# DISPLAY LOWER LEVEL
+	X = SURF_WIDTH/2 - sum(lowX)
+	if len(lowTexts) > 1:
+		for x in range(0,len(lowTexts)):
+			text = lowTexts[x]
+			textrect = lowTexts[x].get_rect()
+			textrect.centerx = X + offset + lowX[x]
+			textrect.centery = lowY
+			DISPLAYSURF.blit(text, textrect)
+			X += lowX[x] + offset + lowX[x]
+	elif len(lowTexts) > 0:
+		text = lowTexts[0]
+		textrect = text.get_rect()
+		textrect.centerx = SURF_WIDTH/2
+		textrect.centery = lowY
+		DISPLAYSURF.blit(text,textrect)
+
+
+# WRAPPING
+def resource_path(relative):
+	if hasattr(sys, "_MEIPASS"):
+		return os.path.join(sys._MEIPASS, relative)
+	return os.path.join(relative)
+
+# HANDLE ZOOMING
+def zoomIn(KM2PIX):
+	if KM2PIX >= 1/10:
+		KM2PIX *= 2
+	else:
+		KM2PIX *= 10
+	return KM2PIX
+
+def zoomOut(KM2PIX):
+	if KM2PIX <= 1/10:
+		KM2PIX /= 10
+	else:
+		KM2PIX /= 2
+	return KM2PIX
+
 
 
 

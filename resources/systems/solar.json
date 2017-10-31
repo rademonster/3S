@@ -50,7 +50,14 @@
 			}
 		},
 
-		"Jupitor":{
+		"Ceres":{
+			"dia":"473*2",
+			"mass":"9.393*10**2",
+			"rad":"2.767*AU",
+			"color":"WHITE"
+		},
+
+		"Jupiter":{
 			"dia":"11.209*EARTH_DIA",
 			"mass":"317.8*EARTH_MASS",
 			"rad":"5.2*AU",
@@ -108,21 +115,6 @@
 			}
 			
 		},
-		
-		"Neptune":{
-			"dia":"3.883*EARTH_DIA",
-			"mass":"17.147*EARTH_MASS",
-			"rad":"30*AU",
-			"color":"DARKBLUE",
-			
-			"Triton":{
-				"dia":"0.2122*EARTH_DIA",
-				"mass":"2.14*10**4",
-				"rad":"354759",
-				"vel":"-math.sqrt(G*((17.147*EARTH_MASS)**2)/(354759*(2.14*10**4 + 17.147*EARTH_MASS)))",
-				"color":"GRAY"
-			}
-		},
 
 		"Uranus":{
 			"dia":"4*EARTH_DIA",
@@ -167,16 +159,22 @@
 				"mass":"3.014*10**3",
 				"rad":"583520",
 				"color":"LIGHTGRAY"
-			},
-
-
-			"Ceres":{
-				"dia":"473*2",
-				"mass":"9.393*10**2",
-				"rad":"2.767*AU",
-				"color":"WHITE"
 			}
+		},
 
+		"Neptune":{
+			"dia":"3.883*EARTH_DIA",
+			"mass":"17.147*EARTH_MASS",
+			"rad":"30*AU",
+			"color":"DARKBLUE",
+			
+			"Triton":{
+				"dia":"0.2122*EARTH_DIA",
+				"mass":"2.14*10**4",
+				"rad":"354759",
+				"vel":"-math.sqrt(G*((17.147*EARTH_MASS)**2)/(354759*(2.14*10**4 + 17.147*EARTH_MASS)))",
+				"color":"GRAY"
+			}
 		},
 
 		"Pluto":{

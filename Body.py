@@ -32,13 +32,20 @@ class Body(object):
     def addChild(self, Child):
         self.Children.append(Child)
 
+    # REMOVERS
+    def removeChild(self, Child):
+        del self.Children[Child]
+
 
     # GETTERS
     def getChildren(self):
         return self.Children
     def getParent(self):
         return self.Parent
-
+	
+	
+		
+	# SYSTEM UTILIZERS
     def _str(self, depth):
         rslt = depth*3*" "+self.Name
         for i in self.Children:
