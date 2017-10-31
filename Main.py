@@ -10,6 +10,9 @@ from pygame.locals import *
 from system import *
 from BackEndData import *
 
+from websocket_server import WebsocketServer
+import json
+
 
 ##################################################################################
 ############# MAIN PROGRAM ##############
@@ -326,6 +329,22 @@ def initialize_bodies():
 	filename = 'solar.json'
 	path = resource_path(os.path.join('resources',filename))
 	ALL_BODIES = System(path)
+	clients = []
+
+	def new_client(client, server):
+	    clients.append(client)
+	    server.send_message_to_all("Hey all, a new client has joined us")
+
+	def message_received(client, server, message):
+		print("Client(%d) said: %s" % (client['id'], message))
+		for i in ALL_BODIES:
+			s = json.dumps({"t":"Optical", "rt":"Body", "m":float(i.Mass), "v":{"x":float(i.Velocity[0]), "y":float(i.Velocity[1])} , "n":i.Name})
+			server.send_message(client, s)
+
+	server = WebsocketServer(13254, host='127.0.0.1')
+	server.set_fn_new_client(new_client)
+	server.set_fn_message_received(message_received)
+	server.run_forever()
 
 
 
